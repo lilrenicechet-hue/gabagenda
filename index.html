@@ -3,17 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>GABCalendar · Agenda Integrada do Gabinete</title>
-<meta name="description" content="GABCalendar: agendas do gabinete integradas ao Google Sheets.">
+<title>GABAgenda · Agenda Integrada do Gabinete</title>
+<meta name="description" content="GABAgenda: agendas do gabinete integradas ao Google Sheets.">
 <meta name="theme-color" content="#0f172a">
-<meta name="application-name" content="GABCalendar">
+<meta name="application-name" content="GABAgenda">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="GABCalendar">
+<meta name="apple-mobile-web-app-title" content="GABAgenda">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <script>try { if (localStorage.getItem('gcal_tema') === 'escuro') document.documentElement.classList.add('escuro'); } catch (e) {}</script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:wght@400;700;900&family=Lato:wght@300;400;700;900&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#f8fafc;--card:#fff;--soft:#f8fafc;--soft2:#f1f5f9;--line:#e2e8f0;--line2:#f1f5f9;
@@ -384,8 +384,113 @@ html.escuro #painel-online header{background:linear-gradient(90deg,#0f291d,var(-
 .carr-box h3{margin:4px 0;font-size:19px;font-weight:900}
 .carr-box p{margin:0;color:var(--mut);font-size:13px}
 @media(prefers-reduced-motion:reduce){.tab.ativo,.m-box,.modal.aberto{animation:none}.anel svg{animation-duration:2.4s}.ponto{animation:none}}
+/* ===== Agenda Executiva: painel de criação ===== */
+#tab-executiva{--exc:#be185d}
+.ex-grade{display:grid;grid-template-columns:400px minmax(0,1fr);gap:16px;align-items:start}
+@media(max-width:1180px){.ex-grade{grid-template-columns:1fr}}
+.ex-sec{display:flex;align-items:center;gap:8px;margin:16px 0 8px}
+.ex-sec b{width:20px;height:20px;border-radius:6px;background:var(--exc);color:#fff;font-size:10px;font-weight:900;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px -4px var(--exc);flex-shrink:0}
+.ex-sec span{font-size:10.5px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--exc)}
+.ex-sec::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,color-mix(in srgb,var(--exc) 35%,transparent),transparent)}
+.ex-rapidos{display:flex;flex-wrap:wrap;gap:6px;padding:8px;border-radius:10px;background:var(--soft);border:1px solid var(--line2);margin-top:8px}
+.ex-rapidos button{height:26px;padding:0 9px;border-radius:7px;border:1px solid var(--line);background:var(--card);font-size:11px;font-weight:700;color:var(--tx2);transition:.15s}
+.ex-rapidos button:hover,.ex-rapidos button.pulso{background:var(--exc);border-color:var(--exc);color:#fff}
+.ex-rapidos button.pulso{transform:scale(.92)}
+.ex-btn-add{width:100%;height:46px;border-radius:12px;color:#fff;font-weight:800;font-size:14px;background:linear-gradient(90deg,var(--exc),color-mix(in srgb,var(--exc) 72%,#fff));box-shadow:0 10px 20px -12px var(--exc);display:flex;align-items:center;justify-content:center;gap:8px;margin-top:16px;transition:.25s}
+.ex-btn-add:hover{filter:brightness(1.07)}.ex-btn-add:active{transform:scale(.98)}
+.ex-btn-add.ok{background:linear-gradient(90deg,#10b981,#34d399);box-shadow:0 10px 20px -12px #10b981}
+.ex-btn-add:disabled{opacity:.7;cursor:wait}
+.ex-limpar{width:38px;flex-shrink:0;border:1px solid var(--line);border-radius:9px;color:var(--mut);background:var(--card)}
+.ex-limpar:hover{color:var(--tx);background:var(--soft)}
+.ex-prev{background:var(--soft2);border-radius:14px;border:1px solid var(--line);padding:14px;overflow:hidden}
+.ex-prev-barra{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.ex-palco{position:relative;margin:0 auto}
+.ex-palco>.ex-page{position:absolute;top:0;left:0;transform-origin:top left;box-shadow:0 20px 25px -5px rgba(0,0,0,.15),0 10px 10px -5px rgba(0,0,0,.05)}
 @media(max-width:640px){.sr-hide{display:none}.cal-topo h3{font-size:15px}}
 @media print{body *{visibility:hidden}}
+</style>
+<style id="css-executiva">
+/* ===== Agenda Executiva: folha A4 (mesmo formato do documento oficial) ===== */
+.ex-page{--t:#be185d;--t-esc:#831843;--t-esc2:#9d174d;--t-cl:#fff0f5;--t-txt:#fbcfe8;--t-wm:rgba(190,24,93,.04);--t-man:#db2777;
+  width:210mm;height:297mm;min-height:297mm;max-height:297mm;padding:0;background-color:var(--t-cl);display:flex;flex-direction:column;box-sizing:border-box;position:relative;overflow:hidden;
+  font-family:'Lato',sans-serif;color:#1e293b;text-align:left;font-size:12px;line-height:1.3;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.ex-page *{box-sizing:border-box}
+.ex-wm{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.ex-wm i{position:absolute;color:var(--t-wm)}
+.ex-wm .w1{top:12%;left:5%;font-size:180px;transform:rotate(-15deg)}.ex-wm .w2{top:45%;right:-2%;font-size:220px;transform:rotate(20deg)}
+.ex-wm .w3{bottom:15%;left:10%;font-size:150px;transform:rotate(-10deg)}.ex-wm .w4{bottom:35%;right:25%;font-size:110px;transform:rotate(15deg)}
+.ex-wm .w5{top:25%;left:45%;font-size:140px;transform:rotate(5deg);opacity:.5}
+.ex-head{background:linear-gradient(135deg,var(--t-esc) 0%,var(--t) 50%,var(--t-esc2) 100%);color:#fff;padding:2.5mm 5mm 2mm 5mm;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center;position:relative;overflow:hidden;border-bottom-left-radius:15px;box-shadow:0 2px 4px -1px rgba(0,0,0,.1);flex-shrink:0;z-index:1}
+.ex-flag{position:absolute;top:-20%;left:-5%;width:40%;height:140%;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 200' fill='none' stroke='rgba(255,255,255,0.15)' stroke-width='2'%3E%3Cpolygon points='150,20 280,100 150,180 20,100' fill='rgba(255,255,255,0.03)' /%3E%3Ccircle cx='150' cy='100' r='55' stroke='rgba(255,255,255,0.15)' stroke-width='3' /%3E%3Cpolygon points='150,60 160,90 195,90 167,110 178,145 150,125 122,145 133,110 105,90 140,90' fill='rgba(255,255,255,0.05)' /%3E%3C/svg%3E");background-repeat:no-repeat;background-position:center;background-size:contain;opacity:.1;z-index:0;pointer-events:none}
+.ex-head-ics{position:absolute;right:28%;top:12px;font-size:18px;color:rgba(255,255,255,.08);display:flex;gap:15px;transform:rotate(-5deg);z-index:0;pointer-events:none}
+.ex-head-cap{position:absolute;right:10px;bottom:-10px;font-size:50px;color:rgba(255,255,255,.04);transform:rotate(-10deg);z-index:0;pointer-events:none}
+.ex-head-in{position:relative;z-index:1;display:flex;flex-direction:column;gap:2px;padding-left:12px;border-left:1px solid rgba(255,255,255,.3)}
+.ex-nome{font-family:'Playfair Display',serif;font-size:1.5rem;color:#fff;font-weight:900;letter-spacing:-.5px;text-shadow:0 2px 4px rgba(0,0,0,.4);line-height:1.2}
+.ex-sep{width:40px;height:1px;background-color:rgba(255,255,255,.4);margin:2px 0}
+.ex-linha{display:flex;align-items:center;gap:12px;margin-top:4px}
+.ex-titulo{font-family:'Playfair Display',serif;font-size:.95rem;line-height:1;margin:0;font-weight:700;letter-spacing:.5px;text-shadow:0 1px 2px rgba(0,0,0,.3);text-transform:uppercase;opacity:.9;color:var(--t-txt);display:flex;align-items:center;gap:6px}
+.ex-titulo i{color:rgba(255,255,255,.5);font-size:10px}
+.ex-data{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);padding:3px 10px;border-radius:15px;font-size:.8rem;font-weight:800;color:#fff;box-shadow:0 2px 4px rgba(0,0,0,.1)}
+.ex-data i{color:#fde047}
+.ex-frase{position:relative;z-index:1;max-width:250px;text-align:right;padding-left:10px;border-right:1px solid rgba(255,255,255,.3);padding-right:8px}
+.ex-frase p{margin:0}
+.ex-frase .q{font-family:'Dancing Script',cursive;font-size:1.1rem;line-height:1.1;color:#fef3c7;margin-bottom:2px;font-weight:600}
+.ex-frase .a{font-size:.6rem;text-transform:uppercase;letter-spacing:.05em;color:var(--t-txt);opacity:.9}
+.ex-conteudo{padding:0 5mm 8mm 5mm;flex-grow:1;display:flex;flex-direction:column;height:100%;overflow:hidden;position:relative;z-index:1}
+.ex-escala-in{flex-grow:1;position:relative;overflow:hidden;margin-bottom:15px;width:100%}
+.ex-lista{display:flex;flex-direction:column;position:absolute;top:0;left:0;width:100%;transform-origin:top left}
+.ex-lista.l-comfortable{gap:14px}.ex-lista.l-standard{gap:8px}.ex-lista.l-compact{gap:5px}.ex-lista.l-super{gap:3px}.ex-lista.l-extreme{gap:2px}
+.ex-vazio{margin-top:40mm;text-align:center;color:#94a3b8;font-weight:800;text-transform:uppercase;letter-spacing:.15em;font-size:11px}
+.ex-vazio i{display:block;font-size:34px;margin-bottom:10px;color:var(--t);opacity:.35}
+.ex-item{display:flex;flex-direction:row;border:1px solid #e2e8f0;background-color:#fff;font-size:8px;box-shadow:0 1px 1px rgba(0,0,0,.02);border-radius:3px;overflow:hidden;flex-shrink:0;position:relative}
+.ex-item.t-interna{border-left:6px solid #10b981}.ex-item.t-externa{border-left:6px solid #ef4444}.ex-item.t-online{border-left:6px solid #3b82f6}.ex-item.t-nenhum{border-left:6px solid var(--t)}
+.ex-item.t-interna .ex-lb i,.ex-item.t-interna .ex-bul{color:#10b981}.ex-item.t-externa .ex-lb i,.ex-item.t-externa .ex-bul{color:#ef4444}
+.ex-item.t-online .ex-lb i,.ex-item.t-online .ex-bul{color:#3b82f6}.ex-item.t-nenhum .ex-lb i,.ex-item.t-nenhum .ex-bul{color:var(--t)}
+.ex-item.prio{border-top:2px solid #ef4444;border-right:2px solid #ef4444;border-bottom:2px solid #ef4444;box-shadow:0 2px 8px rgba(239,68,68,.15)}
+.ex-prio-strip{width:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border-right:1px solid rgba(255,255,255,.2);background-color:#dc2626}
+.ex-prio-strip{position:relative;overflow:hidden}
+.ex-prio-strip span{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-90deg);color:#fff;font-weight:800;font-size:6px;line-height:1;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+.ex-tempo{width:55px;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:2px;text-align:center;color:#fff;flex-shrink:0}
+.ex-tempo .ic{font-size:.7rem;margin-bottom:4px}
+.ex-tempo .h1{font-size:1rem;font-weight:700;line-height:1}
+.ex-tempo .ate{font-size:8px;margin-top:4px;opacity:.9}
+.ex-tempo .h2{font-size:.7rem;font-weight:700}
+.ex-tempo .per{font-size:6px;margin-top:4px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;border-top:1px solid rgba(255,255,255,.3);padding-top:4px;width:100%}
+.p-manha{background:linear-gradient(180deg,var(--t-man),var(--t));border-right:1px solid var(--t-esc2)}
+.p-tarde{background:linear-gradient(180deg,#f59e0b,#d97706);border-right:1px solid #b45309}
+.p-noite{background:linear-gradient(180deg,#6366f1,#4f46e5);border-right:1px solid #4338ca}
+.p-dia{background:linear-gradient(180deg,#475569,#334155);border-right:1px solid #1e293b}
+.ex-info{flex-grow:1;min-width:0;padding:4px 8px;display:flex;flex-direction:column;justify-content:center;gap:4px}
+.ex-info-cab{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px;padding-bottom:4px;border-bottom:1px solid #e2e8f0}
+.ex-info-tit{font-weight:900;color:#1e293b;text-transform:uppercase;line-height:1.1;font-size:15px}
+.ex-badges{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.ex-badge-prio{padding:1px 5px;background:#fee2e2;color:#b91c1c;font-size:8px;font-weight:700;border-radius:2px;border:1px solid #fecaca;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.ex-badge-pend{padding:1px 5px;background:#fef3c7;color:#92400e;font-size:8px;font-weight:700;border-radius:2px;border:1px solid #fde68a}
+.ex-tipo{display:inline-flex;align-items:center;gap:4px;padding:3px 6px;border-radius:4px;font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.ex-tipo.interna{background-color:#ecfdf5;color:#065f46;border:1px solid #a7f3d0}.ex-tipo.externa{background-color:#fef2f2;color:#991b1b;border:1px solid #fecaca}.ex-tipo.online{background-color:#eff6ff;color:#1e40af;border:1px solid #bfdbfe}
+.ex-grid{display:flex;flex-direction:column;width:100%}
+.ex-cel{display:flex;flex-direction:row;align-items:flex-start;padding:4px 0;border-bottom:1px solid #f1f5f9}
+.ex-cel:first-child{padding-top:0}.ex-cel:last-child{border-bottom:none;padding-bottom:0}
+.ex-lb{font-size:9px;text-transform:uppercase;font-weight:900;display:flex;align-items:center;gap:4px;width:95px;flex-shrink:0;color:#64748b;margin-top:2px}
+.ex-lb i{width:12px;text-align:center}
+.ex-val{font-size:12.5px;font-weight:700;color:#1e293b;line-height:1.2;display:flex;flex-direction:column;flex-grow:1;justify-content:center;min-width:0;word-break:break-word}
+.ex-pautas{display:flex;flex-direction:column;gap:3px}
+.ex-pauta{display:flex;align-items:flex-start;gap:5px}
+.ex-bul{margin-top:3px;font-size:7px;flex-shrink:0}
+.ex-sem-pauta{opacity:.5;font-size:8px;font-weight:800;text-transform:uppercase}
+.l-comfortable .ex-item{min-height:95px}.l-comfortable .ex-info-tit{font-size:18px}.l-comfortable .ex-val{font-size:14px}.l-comfortable .ex-lb{width:105px}.l-comfortable .ex-cel{padding:6px 0}
+.l-standard .ex-info-tit{font-size:15px}.l-standard .ex-val{font-size:12.5px}
+.l-compact .ex-info-tit{font-size:13px}.l-compact .ex-val{font-size:11px}.l-compact .ex-lb{font-size:8px;width:85px}.l-compact .ex-cel{padding:3px 0}
+.l-super .ex-info{padding:3px 6px}.l-super .ex-info-cab{margin-bottom:3px;padding-bottom:3px}.l-super .ex-info-tit{font-size:11.5px}.l-super .ex-val{font-size:10px;line-height:1.1}.l-super .ex-lb{font-size:7px;width:75px}.l-super .ex-cel{padding:2px 0}
+.l-extreme .ex-info{padding:2px 4px}.l-extreme .ex-info-cab{margin-bottom:2px;padding-bottom:2px}.l-extreme .ex-info-tit{font-size:10px}.l-extreme .ex-lb{font-size:6px;width:65px}.l-extreme .ex-val{font-size:8.5px;line-height:1.1}.l-extreme .ex-cel{padding:1px 0}
+.l-extreme .ex-tempo{width:40px;padding:1px}.l-extreme .ex-tempo .h1{font-size:.8rem}.l-extreme .ex-tempo .h2,.l-extreme .ex-tempo .ic{display:none}
+.ex-rodape{margin-top:auto;padding-top:10px;padding-bottom:5px;border-top:1px solid #e5e7eb;display:flex;justify-content:center;gap:10px;font-size:8px;color:#9ca3af;text-transform:uppercase;flex-shrink:0;font-weight:700;position:relative;z-index:10}
+.ex-acoes{position:absolute;top:2px;right:2px;display:flex;gap:3px;z-index:20;opacity:0;transition:opacity .2s}
+.ex-item:hover .ex-acoes{opacity:1}
+.ex-acoes button{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;border:none;cursor:pointer;color:#64748b;background:rgba(255,255,255,.95);box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.ex-acoes .ed:hover{color:#3b82f6;background:#dbeafe}.ex-acoes .del:hover{color:#ef4444;background:#fee2e2}.ex-acoes .ab:hover{color:#0f766e;background:#ccfbf1}
+.ex-item.editando{outline:2px dashed var(--t);outline-offset:1px}
+@media print{.ex-acoes{display:none!important}}
 </style>
 </head>
 <body>
@@ -395,7 +500,7 @@ html.escuro #painel-online header{background:linear-gradient(90deg,#0f291d,var(-
   <div class="marca">
     <div class="marca-in">
       <div class="logo-grande"><i class="fa-solid fa-calendar-days"></i></div>
-      <div><h1 class="logo-txt">GAB<span>Calendar</span></h1><p>Agenda integrada do gabinete</p></div>
+      <div><h1 class="logo-txt">GAB<span>Agenda</span></h1><p>Agenda integrada do gabinete</p></div>
     </div>
   </div>
   <div class="lado">
@@ -415,7 +520,7 @@ html.escuro #painel-online header{background:linear-gradient(90deg,#0f291d,var(-
         <button type="submit" id="btn-entrar" class="btn-entrar"><span>Entrar no sistema</span><i class="fa-solid fa-arrow-right-to-bracket"></i></button>
       </form>
       <p class="link-mini">Esqueceu a senha? Procure a administração do sistema.<br><button type="button" onclick="abrirConexao()"><i class="fa-solid fa-plug"></i> Configurar conexão com a planilha</button></p>
-      <div class="rodape-login">SEDUC/MT · GABCalendar · <span id="ano-atual"></span></div>
+      <div class="rodape-login">SEDUC/MT · GABAgenda · <span id="ano-atual"></span></div>
     </div></div>
   </div>
 </div>
@@ -424,11 +529,12 @@ html.escuro #painel-online header{background:linear-gradient(90deg,#0f291d,var(-
 <div id="app" class="app hidden">
   <div id="overlay" onclick="menu(false)"></div>
   <aside id="sidebar" class="padrao">
-    <div class="sb-topo"><div class="sb-logo"><i class="fa-solid fa-calendar-days"></i></div><div class="sb-nome">GAB<span>Calendar</span></div></div>
+    <div class="sb-topo"><div class="sb-logo"><i class="fa-solid fa-calendar-days"></i></div><div class="sb-nome">GAB<span>Agenda</span></div></div>
     <nav class="sb-nav">
       <div class="sb-grupo">Agendas</div>
       <button class="nav" data-tab="agenda" onclick="irPara('agenda')"><i class="fa-solid fa-calendar-days"></i>Agenda integrada</button>
       <button class="nav" data-tab="meudia" onclick="irPara('meudia')"><i class="fa-solid fa-sun"></i>Meu dia<span id="bdg-hoje" class="bdg hidden"></span></button>
+      <button class="nav" data-tab="executiva" onclick="irPara('executiva')"><i class="fa-solid fa-file-pdf"></i>Agenda Executiva (PDF)</button>
       <div class="sb-grupo" id="grp-gestao">Gestão</div>
       <button class="nav" data-tab="relatorios" data-perm="exportar" onclick="irPara('relatorios')"><i class="fa-solid fa-file-lines"></i>Relatórios e geração</button>
       <button class="nav" data-tab="historico" data-perm="historico" onclick="irPara('historico')"><i class="fa-solid fa-clock-rotate-left"></i>Histórico e registros</button>
@@ -451,7 +557,7 @@ html.escuro #painel-online header{background:linear-gradient(90deg,#0f291d,var(-
 
   <main>
     <header class="topo-m">
-      <div style="display:flex;align-items:center;gap:6px"><button class="btn-ic" onclick="menu(true)" aria-label="Menu"><i class="fa-solid fa-bars"></i></button><h1>GAB<span>Calendar</span></h1></div>
+      <div style="display:flex;align-items:center;gap:6px"><button class="btn-ic" onclick="menu(true)" aria-label="Menu"><i class="fa-solid fa-bars"></i></button><h1>GAB<span>Agenda</span></h1></div>
       <div style="display:flex;gap:4px"><button class="btn-ic" onclick="alternarOnline(this)" aria-label="Online"><i class="fa-solid fa-user-group"></i></button><button class="btn-ic" data-perm="criar" onclick="novoEvento()" aria-label="Novo compromisso" style="background:var(--azul);color:#fff"><i class="fa-solid fa-plus"></i></button></div>
     </header>
 
@@ -503,6 +609,63 @@ html.escuro #painel-online header{background:linear-gradient(90deg,#0f291d,var(-
         </div>
       </div></div>
       <div class="corpo" id="md-corpo"></div>
+    </section>
+
+    <!-- Agenda Executiva -->
+    <section id="tab-executiva" class="tab">
+      <div class="cab padrao"><div class="cab-in">
+        <div><h2><i class="fa-solid fa-file-pdf" style="color:#f9a8d4"></i>Agenda Executiva</h2><p>Monte a agenda do dia no formato do documento oficial e exporte em PDF A4. Tudo o que é criado aqui vai para a planilha.</p></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap" data-perm="exportar"><button class="btn btn-v" onclick="exImprimir()"><i class="fa-solid fa-print"></i>Imprimir</button><button class="btn btn-b" id="ex-pdf" onclick="exPDF()"><i class="fa-solid fa-file-pdf" style="color:#be185d"></i>Salvar PDF (A4)</button></div>
+      </div></div>
+      <div class="corpo"><div class="ex-grade">
+        <div class="card pad" id="ex-form">
+          <div class="form-g">
+            <div><label class="lb" for="ex-ag">Agenda</label><select class="inp" id="ex-ag" onchange="exTrocouAgenda()"></select></div>
+            <div><label class="lb" for="ex-data">Data</label><input type="date" class="inp" id="ex-data" onchange="exRender()"></div>
+            <div class="full"><label class="lb" for="ex-nome">Nome no cabeçalho</label><input class="inp" id="ex-nome" maxlength="90" oninput="exRender()"></div>
+          </div>
+          <div id="ex-sem-perm" class="aviso info hidden" style="margin:14px 0 0"><i class="fa-solid fa-lock"></i> Seu perfil não permite criar compromissos nesta agenda. Você pode visualizar e exportar o documento.</div>
+          <div id="ex-campos">
+            <div class="ex-sec"><b>1</b><span>Agenda</span></div>
+            <div class="form-g">
+              <div><label class="lb" for="ex-tipo">Tipo</label><select class="inp" id="ex-tipo"><option>Interna</option><option>Externa</option><option>Online</option></select></div>
+              <div><label class="lb" for="ex-prio">Nível de prioridade</label><select class="inp" id="ex-prio"><option value="">Normal</option><option value="Alta">Alta prioridade</option></select></div>
+            </div>
+            <div class="ex-sec"><b>2</b><span>Horário</span></div>
+            <div class="form-g">
+              <div><label class="lb" for="ex-ini">Início</label><select class="inp" id="ex-ini" onchange="exAtualizarFim()"></select></div>
+              <div><label class="lb" for="ex-fim">Fim</label><select class="inp" id="ex-fim"></select></div>
+            </div>
+            <div class="ex-sec"><b>3</b><span>Título</span></div>
+            <div style="display:flex;gap:8px"><input class="inp" id="ex-titulo" list="ex-dl-titulos" maxlength="200" placeholder="Selecione ou digite..." style="flex:1"><button type="button" class="ex-limpar" title="Limpar" onclick="$('ex-titulo').value='';$('ex-titulo').focus()"><i class="fa-solid fa-eraser"></i></button></div>
+            <datalist id="ex-dl-titulos"></datalist>
+            <div class="ex-rapidos" id="ex-rap-titulos"></div>
+            <div class="ex-sec"><b>4</b><span>Local e participantes</span></div>
+            <label class="lb" for="ex-local">Local</label>
+            <input class="inp" id="ex-local" list="ex-dl-locais" maxlength="300" placeholder="Selecione ou digite..." style="width:100%"><datalist id="ex-dl-locais"></datalist>
+            <label class="lb" for="ex-part" style="margin-top:12px">Participantes</label>
+            <div style="display:flex;gap:8px"><input class="inp" id="ex-part" maxlength="800" placeholder="Ex.: Diretores..." style="flex:1"><button type="button" class="ex-limpar" title="Limpar" onclick="$('ex-part').value='';$('ex-part').focus()"><i class="fa-solid fa-eraser"></i></button></div>
+            <div class="ex-rapidos" id="ex-rap-part"></div>
+            <div class="ex-sec"><b>5</b><span>Pautas</span></div>
+            <textarea class="inp" id="ex-pautas" rows="4" maxlength="4000" placeholder="Lista de tópicos (um por linha)..." style="width:100%"></textarea>
+            <button type="button" class="ex-btn-add" id="ex-add" onclick="exSalvar()"><i class="fa-solid fa-plus" id="ex-add-ic"></i><span id="ex-add-txt">Adicionar à agenda</span></button>
+            <button type="button" class="btn btn-s hidden" id="ex-cancelar" style="width:100%;margin-top:8px" onclick="exResetForm()"><i class="fa-solid fa-xmark"></i>Cancelar edição</button>
+          </div>
+          <p id="ex-info" style="font-size:12px;color:var(--mut);margin:14px 0 0;line-height:1.5"></p>
+        </div>
+        <div class="ex-prev">
+          <div class="ex-prev-barra">
+            <b id="ex-resumo" style="font-size:13px"></b>
+            <span style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap">
+              <button class="btn btn-s" style="height:32px;font-size:12px" onclick="exNovaFrase()"><i class="fa-solid fa-quote-right"></i>Trocar frase</button>
+              <button class="btn btn-s" style="height:32px;width:34px;padding:0" onclick="exIrDia(-1)" aria-label="Dia anterior"><i class="fa-solid fa-chevron-left"></i></button>
+              <button class="btn btn-s" style="height:32px;font-size:12px" onclick="exIrDia(0)">Hoje</button>
+              <button class="btn btn-s" style="height:32px;width:34px;padding:0" onclick="exIrDia(1)" aria-label="Próximo dia"><i class="fa-solid fa-chevron-right"></i></button>
+            </span>
+          </div>
+          <div class="ex-palco" id="ex-palco"></div>
+        </div>
+      </div></div>
     </section>
 
     <!-- Relatórios -->
@@ -591,6 +754,8 @@ html.escuro #painel-online header{background:linear-gradient(90deg,#0f291d,var(-
         <div class="full"><label class="lb" for="ev-titulo">Título <span class="req">*</span></label><input class="inp" id="ev-titulo" maxlength="200" placeholder="Ex.: Reunião com diretores regionais" oninput="checarConflito()"></div>
         <div><label class="lb" for="ev-tipo">Tipo</label><select class="inp" id="ev-tipo"></select></div>
         <div><label class="lb" for="ev-status">Situação</label><select class="inp" id="ev-status"><option>Confirmado</option><option>Pendente</option><option>Realizado</option><option>Cancelado</option></select></div>
+        <div><label class="lb" for="ev-modalidade">Modalidade</label><select class="inp" id="ev-modalidade"><option value="">Não informada</option><option>Interna</option><option>Externa</option><option>Online</option></select></div>
+        <div style="display:flex;align-items:flex-end;padding-bottom:9px"><label style="display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;cursor:pointer"><input type="checkbox" id="ev-prioridade"> <i class="fa-solid fa-circle-exclamation" style="color:#dc2626"></i> Alta prioridade</label></div>
         <div><label class="lb" for="ev-data">Data <span class="req">*</span></label><input type="date" class="inp" id="ev-data" onchange="checarConflito()"></div>
         <div style="display:flex;gap:10px;align-items:flex-end">
           <div style="flex:1"><label class="lb" for="ev-inicio">Início</label><input type="time" class="inp" id="ev-inicio" onchange="ajustarFim(); checarConflito()"></div>
@@ -652,7 +817,7 @@ html.escuro #painel-online header{background:linear-gradient(90deg,#0f291d,var(-
 
 <div id="m-conexao" class="modal" onclick="if(event.target===this)fecharModal('m-conexao')">
   <div class="m-box" style="max-width:600px">
-    <div class="m-topo"><div class="m-ico"><i class="fa-solid fa-plug"></i></div><div><h3>Conexão e aplicativo</h3><p>Endereço do Apps Script e instalação do GABCalendar.</p></div><button class="fechar" onclick="fecharModal('m-conexao')"><i class="fa-solid fa-xmark fa-lg"></i></button></div>
+    <div class="m-topo"><div class="m-ico"><i class="fa-solid fa-plug"></i></div><div><h3>Conexão e aplicativo</h3><p>Endereço do Apps Script e instalação do GABAgenda.</p></div><button class="fechar" onclick="fecharModal('m-conexao')"><i class="fa-solid fa-xmark fa-lg"></i></button></div>
     <div class="m-corpo">
       <label class="lb" for="cx-url">URL do Web App (Apps Script, termina em /exec)</label>
       <input class="inp" id="cx-url" style="width:100%" placeholder="https://script.google.com/macros/s/.../exec">
@@ -680,14 +845,14 @@ html.escuro #painel-online header{background:linear-gradient(90deg,#0f291d,var(-
 <div id="toast"><i id="toast-ic" class="fa-solid fa-circle-check" style="color:#4ade80"></i><span id="toast-msg"></span></div>
 <div id="carregando"><div class="carr-box">
   <div class="anel"><svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="36" fill="none" stroke="#e2e8f0" stroke-width="4"/><circle cx="40" cy="40" r="36" fill="none" stroke="#3b82f6" stroke-width="4" stroke-linecap="round" stroke-dasharray="70 226"/></svg><div><i class="fa-solid fa-calendar-days"></i></div></div>
-  <small>GAB<span style="color:var(--azul)">CALENDAR</span></small><h3 id="carr-tit">Aguarde...</h3><p id="carr-desc">Carregando.</p>
+  <small>GAB<span style="color:var(--azul)">AGENDA</span></small><h3 id="carr-tit">Aguarde...</h3><p id="carr-desc">Carregando.</p>
 </div></div>
 
 <script>
 // =================== CONFIGURAÇÃO ===================
 // Cole aqui a URL /exec do Apps Script para que todos usem o mesmo endereço sem configurar.
 const URL_APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbyw7l7L6je29IROxu1YSBccyW5j58LJw5CKwW5DSG205kLy62bii6zBtIoC_Z2Kqv50Jw/exec';
-const VERSAO = '1.0.0';
+const VERSAO = '1.1.0';
 const TIPOS = ['Reunião', 'Audiência', 'Agenda externa', 'Evento', 'Videoconferência', 'Despacho interno', 'Visita', 'Viagem', 'Outro'];
 const COR_ST = { 'Confirmado': '#16a34a', 'Pendente': '#d97706', 'Realizado': '#2563eb', 'Cancelado': '#dc2626' };
 const PERMS = [
@@ -930,7 +1095,7 @@ async function recarregar(silencioso) {
     if (!silencioso) toast('Agendas atualizadas.');
   } catch (e) { if (!silencioso) toast(e.message, 'erro'); }
 }
-const ROT_ABA = { agenda: 'Agenda integrada', meudia: 'Meu dia', relatorios: 'Relatórios', historico: 'Histórico', admin: 'Administração' };
+const ROT_ABA = { agenda: 'Agenda integrada', meudia: 'Meu dia', executiva: 'Agenda Executiva', relatorios: 'Relatórios', historico: 'Histórico', admin: 'Administração' };
 const PERM_ABA = { relatorios: 'exportar', historico: 'historico', admin: 'admin' };
 const abaPermitida = t => !PERM_ABA[t] || perm(PERM_ABA[t]);
 function irPara(t) {
@@ -947,6 +1112,7 @@ function irPara(t) {
 function renderAtual() {
   if (abaAtual === 'agenda') renderAgenda();
   else if (abaAtual === 'meudia') renderMeuDia();
+  else if (abaAtual === 'executiva') exPreparar();
   else if (abaAtual === 'relatorios') renderRelatorio();
   else if (abaAtual === 'admin' && admSecao === 'online') renderAdmOnline();
 }
@@ -1179,7 +1345,7 @@ function evCard(e, o = {}) {
   const a = agDe(e.agendaId) || { sigla: '?', cor: '#64748b', titular: '' }, link = safeUrl(e.link);
   return `<div class="ev-card ${e.status === 'Cancelado' ? 'canc' : ''}" style="--c:${a.cor}" onclick="abrirEvento(${jsA(e.id)})">
     <div class="l1"><span class="hora">${o.data ? `<span style="font-weight:600;color:var(--mut);font-size:12px">${cap(fmtData(e.data, { weekday: 'short', day: '2-digit', month: '2-digit' }))} · </span>` : ''}${esc(horaTxt(e))}</span>
-      <span style="display:flex;gap:4px"><span class="tag" style="--c:${a.cor}">${esc(a.sigla)}</span>${e.status !== 'Confirmado' ? `<span class="tag" style="--c:${COR_ST[e.status]}">${esc(e.status)}</span>` : ''}</span></div>
+      <span style="display:flex;gap:4px">${e.prioridade === 'Alta' ? '<span class="tag" style="--c:#dc2626"><i class="fa-solid fa-circle-exclamation"></i>Prioridade</span>' : ''}<span class="tag" style="--c:${a.cor}">${esc(a.sigla)}</span>${e.status !== 'Confirmado' ? `<span class="tag" style="--c:${COR_ST[e.status]}">${esc(e.status)}</span>` : ''}</span></div>
     <div class="tit">${esc(e.titulo)}</div>
     <div class="meta">${e.tipo ? `<span><i class="fa-solid fa-tag"></i>${esc(e.tipo)} · ${esc(a.titular)}</span>` : ''}${e.local ? `<span><i class="fa-solid fa-location-dot"></i>${esc(e.local)}</span>` : ''}${e.participantes ? `<span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><i class="fa-solid fa-users"></i>${esc(e.participantes)}</span>` : ''}</div>
     <div class="rod"><span class="cod">${esc(e.codigo)}</span>${link ? `<a class="link-sala" href="${esc(link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()"><i class="fa-solid fa-video"></i>Entrar</a>` : ''}</div></div>`;
@@ -1205,6 +1371,7 @@ function formEvento(e, leitura) {
   $('ev-titulo').value = e.titulo || ''; preencherTipos(e.tipo || 'Reunião');
   $('ev-status').value = e.status || 'Confirmado'; $('ev-data').value = e.data || V.dia || hojeISO();
   $('ev-inicio').value = e.inicio || ''; $('ev-fim').value = e.fim || ''; $('ev-dia-inteiro').checked = !!e.diaInteiro;
+  $('ev-modalidade').value = e.modalidade || ''; $('ev-prioridade').checked = e.prioridade === 'Alta';
   $('ev-local').value = e.local || ''; $('ev-link').value = e.link || ''; $('ev-participantes').value = e.participantes || ''; $('ev-descricao').value = e.descricao || '';
   document.querySelectorAll('#m-evento .m-corpo input:not([type=hidden]), #m-evento .m-corpo select, #m-evento .m-corpo textarea').forEach(i => { if (i.name !== 'ev-ag') i.disabled = !!leitura; });
   $('ev-leitura').classList.toggle('hidden', !leitura);
@@ -1288,7 +1455,8 @@ async function salvarEvento() {
   const ev = {
     id: $('ev-id').value, agendaId: agSel(), titulo: $('ev-titulo').value.trim(), tipo: $('ev-tipo').value, status: $('ev-status').value,
     data: $('ev-data').value, inicio: $('ev-inicio').value, fim: $('ev-fim').value, diaInteiro: $('ev-dia-inteiro').checked,
-    local: $('ev-local').value.trim(), link: $('ev-link').value.trim(), participantes: $('ev-participantes').value.trim(), descricao: $('ev-descricao').value.trim()
+    local: $('ev-local').value.trim(), link: $('ev-link').value.trim(), participantes: $('ev-participantes').value.trim(), descricao: $('ev-descricao').value.trim(),
+    modalidade: $('ev-modalidade').value, prioridade: $('ev-prioridade').checked ? 'Alta' : ''
   };
   if (!ev.agendaId) return toast('Escolha a agenda.', 'aviso');
   if (!ev.titulo) { $('ev-titulo').focus(); return toast('Informe o título.', 'aviso'); }
@@ -1474,7 +1642,7 @@ function exportarCSV() {
   const linhas = l.map(e => { const a = agDe(e.agendaId) || {}; return [e.codigo, fmtData(e.data), e.diaInteiro ? 'Dia inteiro' : e.inicio, e.fim, a.sigla, a.titular, e.titulo, e.tipo, e.status, e.local, e.link, e.participantes, e.descricao, e.criadoPor, fmtQuando(e.criadoEm)].map(q).join(';'); });
   const txt = '﻿' + [`${q('Código de geração')};${q(cod)}`, cab.map(q).join(';'), ...linhas].join('\r\n');
   const url = URL.createObjectURL(new Blob([txt], { type: 'text/csv;charset=utf-8' })), a = document.createElement('a');
-  a.href = url; a.download = `GABCalendar_${$('rel-de').value}_a_${$('rel-ate').value}.csv`; document.body.appendChild(a); a.click(); a.remove();
+  a.href = url; a.download = `GABAgenda_${$('rel-de').value}_a_${$('rel-ate').value}.csv`; document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 2000);
   registrarGeracao(cod, 'CSV', l); toast('CSV gerado · ' + cod);
 }
@@ -1506,7 +1674,7 @@ function imprimirRelatorio() {
     <div class="cab"><div><small>Governo de Mato Grosso</small><b>Secretaria de Estado de Educação · Gabinete</b></div><div style="text-align:right;font-family:Consolas,monospace;font-size:10px">${esc(cod)}</div></div>
     <h1>${esc(tit)}</h1><div class="sub">Período: ${esc(fmtData($('rel-de').value))} a ${esc(fmtData($('rel-ate').value))} · ${l.length} compromisso(s)</div>
     ${corpo}
-    <div class="rod"><span>Gerado por ${esc(S.eu.usuario)} em ${agora.toLocaleDateString('pt-BR')} às ${agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })} · GABCalendar</span><span>Código de geração: ${esc(cod)}</span></div>
+    <div class="rod"><span>Gerado por ${esc(S.eu.usuario)} em ${agora.toLocaleDateString('pt-BR')} às ${agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })} · GABAgenda</span><span>Código de geração: ${esc(cod)}</span></div>
   </body></html>`;
   const fr = document.createElement('iframe');
   fr.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0';
@@ -1551,7 +1719,7 @@ function renderAdmUsuarios() {
 }
 function renderAdmOnline() {
   const l = S.online || [];
-  $('adm-conteudo').innerHTML = `<div class="card"><div class="pad adm-cab" style="margin:0;border-bottom:1px solid var(--line2)"><div><h3>Online agora</h3><p>Quem está com o GABCalendar aberto, em qual tela e qual compromisso está vendo. Atualiza a cada 20 segundos; some após ~90 s sem sinal.</p></div>
+  $('adm-conteudo').innerHTML = `<div class="card"><div class="pad adm-cab" style="margin:0;border-bottom:1px solid var(--line2)"><div><h3>Online agora</h3><p>Quem está com o GABAgenda aberto, em qual tela e qual compromisso está vendo. Atualiza a cada 20 segundos; some após ~90 s sem sinal.</p></div>
     <button class="btn btn-s" onclick="pingAgora()"><i class="fa-solid fa-rotate"></i>Atualizar</button></div>
     ${l.length ? l.map(o => linhaOnline(o, !o.voce ? `<button class="btn-ic" title="Desconectar" onclick="encerrarSessoes(${jsA(o.usuario)})"><i class="fa-solid fa-power-off"></i></button>` : '')).join('') : '<div class="vazio"><i class="fa-solid fa-user-clock"></i>Ninguém online.</div>'}</div>`;
 }
@@ -1623,13 +1791,14 @@ function renderAdmAgendas() {
       <div class="ordem"><button onclick="agMover(${i},-1)" ${i ? '' : 'disabled'}><i class="fa-solid fa-chevron-up"></i></button><button onclick="agMover(${i},1)" ${i < agEdit.length - 1 ? '' : 'disabled'}><i class="fa-solid fa-chevron-down"></i></button></div>
       <label class="campo"><span>Cor</span><input type="color" class="cor-inp" value="${esc(a.cor)}" oninput="agEdit[${i}].cor=this.value"></label>
       <label class="campo" style="width:110px"><span>Sigla</span><input class="inp" value="${esc(a.sigla)}" maxlength="20" oninput="agEdit[${i}].sigla=this.value.toUpperCase()" style="text-transform:uppercase;font-weight:700"></label>
-      <label class="campo" style="flex:1;min-width:180px"><span>Titular</span><input class="inp" value="${esc(a.titular)}" maxlength="80" oninput="agEdit[${i}].titular=this.value"></label>
+      <label class="campo" style="flex:1;min-width:160px"><span>Titular</span><input class="inp" value="${esc(a.titular)}" maxlength="80" oninput="agEdit[${i}].titular=this.value"></label>
+      <label class="campo" style="width:190px"><span>Cargo (cabeçalho do PDF)</span><input class="inp" value="${esc(a.cargo || '')}" maxlength="60" placeholder="Ex.: Secretária Adjunta" oninput="agEdit[${i}].cargo=this.value"></label>
       <div class="campo"><span>Ativa</span><button class="sw ${a.ativo ? 'on' : ''}" onclick="agEdit[${i}].ativo=!agEdit[${i}].ativo;renderAdmAgendas()"><span></span></button></div>
       <button class="btn-ic" title="${usadas.has(a.id) ? 'Tem compromissos: desative em vez de remover' : 'Remover'}" ${usadas.has(a.id) ? 'disabled style="opacity:.35"' : ''} onclick="agEdit.splice(${i},1);renderAdmAgendas()"><i class="fa-solid fa-trash-can"></i></button>
       <span class="cod" style="align-self:center">${esc(a.id || 'nova')}</span></div>`).join('')}
     <div class="barra-salvar"><button class="btn btn-s" onclick="admIr('agendas')">Descartar</button><button class="btn btn-p" onclick="agSalvar(this)"><i class="fa-solid fa-floppy-disk"></i>Salvar agendas</button></div></div>`;
 }
-function agNova() { agEdit.push({ id: '', sigla: '', titular: '', cor: '#' + Math.floor(Math.random() * 0xbbbbbb + 0x222222).toString(16).padStart(6, '0'), ativo: true }); renderAdmAgendas(); }
+function agNova() { agEdit.push({ id: '', sigla: '', titular: '', cargo: '', cor: '#' + Math.floor(Math.random() * 0xbbbbbb + 0x222222).toString(16).padStart(6, '0'), ativo: true }); renderAdmAgendas(); }
 function agMover(i, d) { const j = i + d; [agEdit[i], agEdit[j]] = [agEdit[j], agEdit[i]]; renderAdmAgendas(); }
 async function agSalvar(b) {
   if (agEdit.some(a => !a.sigla.trim())) return toast('Toda agenda precisa de uma sigla.', 'aviso');
@@ -1679,11 +1848,290 @@ async function pfSalvar(b) {
   finally { b.disabled = false; }
 }
 
+// =================== AGENDA EXECUTIVA (DOCUMENTO A4 / PDF) ===================
+const EX_FRASES = [
+  { text: 'Tudo posso naquele que me fortalece.', author: 'Filipenses 4:13' },
+  { text: 'A educação é o grande motor do desenvolvimento pessoal.', author: 'Nelson Mandela' },
+  { text: 'Educar a mente sem educar o coração não é educação.', author: 'Aristóteles' },
+  { text: 'O Senhor é o meu pastor, nada me faltará.', author: 'Salmos 23:1' },
+  { text: 'A educação é a própria vida.', author: 'John Dewey' },
+  { text: 'Feliz aquele que transfere o que sabe.', author: 'Cora Coralina' },
+  { text: 'Entrega o teu caminho ao Senhor; confia nele.', author: 'Salmos 37:5' }
+];
+const EX_TITULOS = ['Inauguração', 'Visita Técnica', 'Reunião Gerencial', 'Entrevista', 'Podcast', 'Audiência Pública'];
+const EX_RAP_TITULOS = ['Agenda', 'SARC', 'SAGE', 'SAIP', 'SAEX', 'SAGP', 'SAGR', 'SAAS'];
+const EX_LOCAIS = ['Sala de Reuniões Gabinete SEDUC', 'Gabinete Sec. Flavia', 'Gabinete Sec. Christina', 'Auditório SEDUC', 'Escola Estadual', 'Casa Civil'];
+const EX_PART = [['Sec. Flavia'], ['Sec. Christina'], ['Sec. Adriana'], ['Sec. Ane'], ['Sec. Matheus'], ['Sec. Geonir'], ['Sec. Hesloan'], ['Sec. Danielle'],
+  ['Gov. Pivetta', 'Gov. Otaviano Pivetta'], ['Adjaime'], ['Sec. Gallo', 'Sec. Rogério Gallo'], ['Equipe']];
+const HTML2PDF_URL = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+let exFrase = EX_FRASES[Math.floor(Math.random() * EX_FRASES.length)], exEditId = '', exPronto = false;
+
+const hexRgb = h => { const n = parseInt(String(h).slice(1), 16) || 0; return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
+function misturar(h, alvo, t) { const a = hexRgb(h), b = hexRgb(alvo); return '#' + a.map((v, i) => Math.round(v + (b[i] - v) * t).toString(16).padStart(2, '0')).join(''); }
+function exTema(cor) {
+  cor = /^#[0-9a-f]{6}$/i.test(cor) ? cor : '#be185d';
+  return `--t:${cor};--t-esc:${misturar(cor, '#000000', .45)};--t-esc2:${misturar(cor, '#000000', .22)};--t-cl:${misturar(cor, '#ffffff', .94)};--t-txt:${misturar(cor, '#ffffff', .72)};--t-man:${misturar(cor, '#ffffff', .18)};--t-wm:rgba(${hexRgb(cor).join(',')},.045)`;
+}
+const exAg = () => agDe($('ex-ag').value);
+const exData = () => $('ex-data').value || hojeISO();
+const exEventos = () => S.eventos.filter(e => e.agendaId === $('ex-ag').value && e.data === exData() && e.status !== 'Cancelado').sort(ordenarEv);
+function exNomeCab(a) { return $('ex-nome').value.trim() || (a ? ((a.cargo ? a.cargo + ' ' : '') + a.titular) : ''); }
+function exDataLonga(d) {
+  return dISO(d).toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+    .split(' ').map(w => w === 'de' ? w : w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+}
+function exHorarios() { const o = []; for (let h = 6; h <= 23; h++) { o.push(pad(h) + ':00'); if (h !== 23) o.push(pad(h) + ':30'); } return o; }
+function exGarantir(sel, v) { if (v && ![...sel.options].some(o => o.value === v)) { sel.add(new Option(v, v)); [...sel.options].sort((a, b) => a.value.localeCompare(b.value)).forEach(o => sel.add(o)); } }
+function exAtualizarFim(alvo) {
+  const ini = $('ex-ini').value, sel = $('ex-fim'), atual = alvo || sel.value;
+  sel.innerHTML = exHorarios().filter(t => t > ini).map(t => `<option>${t}</option>`).join('');
+  if (alvo) exGarantir(sel, alvo);
+  if (atual && [...sel.options].some(o => o.value === atual) && atual > ini) sel.value = atual;
+  else { const um = somarHora(ini, 60); sel.value = [...sel.options].some(o => o.value === um) ? um : (sel.options[0] || {}).value || ''; }
+}
+function exRapido(campo, valor, sep, btn) {
+  const i = $(campo); i.value = i.value.trim() ? i.value.trim() + sep + valor : valor;
+  if (btn) { btn.classList.add('pulso'); setTimeout(() => btn.classList.remove('pulso'), 160); }
+}
+function exPreparar() {
+  const ags = agendasVisiveis().filter(a => a.ativo), sel = $('ex-ag'), atual = sel.value;
+  const padrao = (ags.find(a => a.id === atual) || ags.find(a => minhasAg().includes(a.id)) || ags[0] || {}).id || '';
+  sel.innerHTML = ags.map(a => `<option value="${esc(a.id)}">${esc(a.sigla)} · ${esc(a.titular)}</option>`).join('');
+  sel.value = padrao;
+  if (!$('ex-data').value) $('ex-data').value = V.dia || hojeISO();
+  if (!exPronto) {
+    $('ex-ini').innerHTML = exHorarios().filter(t => t !== '23:00').map(t => `<option>${t}</option>`).join('');
+    $('ex-ini').value = '09:00'; exAtualizarFim();
+    exPronto = true;
+  }
+  const locais = [...new Set([...EX_LOCAIS, ...S.eventos.map(e => e.local).filter(Boolean)])].slice(0, 80);
+  $('ex-dl-locais').innerHTML = locais.map(l => `<option value="${esc(l)}">`).join('');
+  $('ex-dl-titulos').innerHTML = [...new Set([...EX_TITULOS, ...S.eventos.map(e => e.titulo)])].slice(0, 80).map(t => `<option value="${esc(t)}">`).join('');
+  const rapT = [...new Set([...EX_RAP_TITULOS, ...S.agendas.filter(a => a.ativo && a.sigla.length > 3).map(a => a.sigla.replace(/^G/, ''))])];
+  $('ex-rap-titulos').innerHTML = rapT.map(t => `<button type="button" onclick="exRapido('ex-titulo',${jsA(t)},' - ',this)">${esc(t)}</button>`).join('');
+  const nomes = EX_PART.map(p => p[0]), part = [...EX_PART];
+  S.agendas.filter(a => a.ativo).forEach(a => { const n = 'Sec. ' + (a.titular.split(' ')[0] || ''); if (a.titular && !nomes.includes(n)) { nomes.push(n); part.splice(part.length - 4, 0, [n]); } });
+  $('ex-rap-part').innerHTML = part.map(([r, v]) => `<button type="button" onclick="exRapido('ex-part',${jsA(v || r)},', ',this)">${esc(r)}</button>`).join('');
+  exRender();
+}
+function exTrocouAgenda() { $('ex-nome').value = ''; exResetForm(); exRender(); }
+function exIrDia(n) { $('ex-data').value = n === 0 ? hojeISO() : addDias(exData(), n); exResetForm(); exRender(); }
+function exNovaFrase() { let f; do { f = EX_FRASES[Math.floor(Math.random() * EX_FRASES.length)]; } while (EX_FRASES.length > 1 && f === exFrase); exFrase = f; exRender(); }
+function exDensidade(n) { return n <= 5 ? ['l-comfortable', 'Confortável'] : n <= 7 ? ['l-standard', 'Padrão'] : n <= 10 ? ['l-compact', 'Compacta'] : n <= 12 ? ['l-super', 'Supercompacta'] : ['l-extreme', 'Máxima']; }
+
+function exItemHTML(e, i, acoes) {
+  const h = e.diaInteiro || !e.inicio ? null : +e.inicio.slice(0, 2);
+  let per = 'MATUTINO', pc = 'p-manha', ic = 'fa-cloud-sun';
+  if (h === null) { per = e.diaInteiro ? 'DIA INTEIRO' : 'A DEFINIR'; pc = 'p-dia'; ic = 'fa-calendar-day'; }
+  else if (h >= 12 && h < 18) { per = 'VESPERTINO'; pc = 'p-tarde'; ic = 'fa-sun'; }
+  else if (h >= 18) { per = 'NOTURNO'; pc = 'p-noite'; ic = 'fa-moon'; }
+  const mod = { Interna: ['interna', 'fa-building'], Externa: ['externa', 'fa-car'], Online: ['online', 'fa-video'] }[e.modalidade];
+  const prio = e.prioridade === 'Alta';
+  const pautas = String(e.descricao || '').split('\n').map(l => l.replace(/^\s*[-•*▸>]\s*/, '').trim()).filter(Boolean);
+  const pautasHTML = pautas.length ? pautas.map(p => `<div class="ex-pauta"><i class="fa-solid fa-chevron-right ex-bul"></i><span>${esc(p)}</span></div>`).join('')
+    : '<div class="ex-sem-pauta">Sem pautas adicionadas</div>';
+  return `<div class="ex-item ${mod ? 't-' + mod[0] : 't-nenhum'} ${prio ? 'prio' : ''} ${e.id === exEditId ? 'editando' : ''}" data-id="${esc(e.id)}">
+    ${acoes ? `<div class="ex-acoes">${acoes.editar ? `<button type="button" class="ed" title="Editar aqui" onclick="exEditar(${jsA(e.id)})"><i class="fa-solid fa-pen"></i></button>` : ''}<button type="button" class="ab" title="Abrir ficha completa" onclick="abrirEvento(${jsA(e.id)})"><i class="fa-solid fa-up-right-from-square"></i></button>${acoes.excluir ? `<button type="button" class="del" title="Excluir" onclick="exExcluir(${jsA(e.id)})"><i class="fa-solid fa-xmark"></i></button>` : ''}</div>` : ''}
+    ${prio ? '<div class="ex-prio-strip"><span>Agenda com Prioridade</span></div>' : ''}
+    <div class="ex-tempo ${pc}"><div class="ic"><i class="fa-solid ${ic}"></i></div>
+      ${h === null ? `<span class="h1">${e.diaInteiro ? 'DIA' : '--:--'}</span>` : `<span class="h1">${esc(e.inicio)}</span>${e.fim ? `<span class="ate">até</span><span class="h2">${esc(e.fim)}</span>` : ''}`}
+      <span class="per">${per}</span></div>
+    <div class="ex-info">
+      <div class="ex-info-cab"><div class="ex-info-tit">${esc(e.titulo)}</div>
+        <div class="ex-badges">${prio ? '<span class="ex-badge-prio">AGENDA COM PRIORIDADE</span>' : ''}${e.status === 'Pendente' ? '<span class="ex-badge-pend">A CONFIRMAR</span>' : ''}${mod ? `<span class="ex-tipo ${mod[0]}"><i class="fa-solid ${mod[1]}"></i> ${esc(e.modalidade)}</span>` : ''}</div></div>
+      <div class="ex-grid">
+        <div class="ex-cel"><div class="ex-lb"><i class="fa-solid fa-location-dot"></i> Local</div><div class="ex-val">${esc(e.local || '-')}</div></div>
+        <div class="ex-cel"><div class="ex-lb"><i class="fa-solid fa-users"></i> Participantes</div><div class="ex-val">${esc(e.participantes || '-')}</div></div>
+        <div class="ex-cel"><div class="ex-lb"><i class="fa-solid fa-list-check"></i> Pautas</div><div class="ex-val"><div class="ex-pautas">${pautasHTML}</div></div></div>
+      </div></div></div>`;
+}
+function exPaginaHTML(o = {}) {
+  const a = exAg(), evs = exEventos(), [dens] = exDensidade(evs.length);
+  const acoes = o.acoes !== false;
+  const itens = evs.map((e, i) => exItemHTML(e, i, acoes ? { editar: podeEditarAg(e.agendaId, false), excluir: podeExcluirAg(e.agendaId) } : null)).join('');
+  return `<div class="ex-page" style="${exTema(a ? a.cor : '')}">
+    <div class="ex-wm"><i class="fa-solid fa-graduation-cap w1"></i><i class="fa-solid fa-book-open w2"></i><i class="fa-solid fa-pencil w3"></i><i class="fa-solid fa-laptop w4"></i><i class="fa-solid fa-chalkboard-user w5"></i></div>
+    <header class="ex-head"><div class="ex-flag"></div>
+      <div class="ex-head-ics"><i class="fa-solid fa-book-open-reader"></i><i class="fa-solid fa-lightbulb"></i><i class="fa-solid fa-microscope"></i><i class="fa-solid fa-atom"></i><i class="fa-solid fa-palette"></i></div>
+      <i class="fa-solid fa-graduation-cap ex-head-cap"></i>
+      <div class="ex-head-in"><div class="ex-nome">${esc(exNomeCab(a))}</div><div class="ex-sep"></div>
+        <div class="ex-linha"><h1 class="ex-titulo"><i class="fa-solid fa-bookmark"></i> Agenda Executiva</h1><div class="ex-data"><i class="fa-regular fa-calendar"></i><span>${esc(exDataLonga(exData()))}</span></div></div></div>
+      <div class="ex-frase"><p class="q">"${esc(exFrase.text)}"</p><p class="a">- ${esc(exFrase.author)}</p></div>
+    </header>
+    <div class="ex-conteudo"><div class="ex-escala-in"><div class="ex-lista ${dens}">${itens || '<div class="ex-vazio"><i class="fa-regular fa-calendar"></i>Nenhum compromisso nesta data</div>'}</div></div>
+      <footer class="ex-rodape"><span>Documento Executivo</span>${o.codigo ? `<span>·</span><span>${esc(o.codigo)}</span>` : ''}</footer></div></div>`;
+}
+/** Encolhe a lista para caber sempre em uma única folha (igual ao documento original). */
+function exCaber(pagina) {
+  const w = pagina.querySelector('.ex-escala-in'), l = pagina.querySelector('.ex-lista');
+  if (!w || !l) return;
+  l.style.transform = 'none'; l.style.width = '100%';
+  const disp = w.clientHeight, real = l.scrollHeight;
+  if (real > disp && real > 0) { const s = disp / real; l.style.transform = `scale(${s})`; l.style.width = `${100 / s}%`; }
+}
+function exAjustarPalco() {
+  const palco = $('ex-palco'), pg = palco && palco.querySelector('.ex-page');
+  if (!pg) return;
+  const larg = palco.parentElement.clientWidth - 28, s = Math.min(1, larg / pg.offsetWidth);
+  pg.style.transform = `scale(${s})`;
+  palco.style.width = pg.offsetWidth * s + 'px'; palco.style.height = pg.offsetHeight * s + 'px';
+}
+function exRender() {
+  if (abaAtual !== 'executiva' || !S.eu) return;
+  const a = exAg(), evs = exEventos();
+  if (!a) { $('ex-palco').innerHTML = '<div class="vazio"><i class="fa-regular fa-calendar-xmark"></i>Nenhuma agenda disponível para o seu perfil.</div>'; return; }
+  $('tab-executiva').style.setProperty('--exc', a.cor);
+  $('ex-nome').placeholder = (a.cargo ? a.cargo + ' ' : '') + a.titular;
+  const podeCriar = podeEditarAg(a.id, true) || (exEditId && podeEditarAg(a.id, false));
+  $('ex-campos').classList.toggle('hidden', !podeCriar); $('ex-sem-perm').classList.toggle('hidden', !!podeCriar);
+  $('ex-palco').innerHTML = exPaginaHTML();
+  const pg = $('ex-palco').querySelector('.ex-page');
+  exCaber(pg); exAjustarPalco();
+  const [, dn] = exDensidade(evs.length);
+  $('ex-resumo').textContent = `${a.sigla} · ${fmtData(exData())} · ${evs.length} compromisso${evs.length === 1 ? '' : 's'} · densidade ${dn.toLowerCase()}`;
+  const canc = S.eventos.filter(e => e.agendaId === a.id && e.data === exData() && e.status === 'Cancelado').length;
+  $('ex-info').innerHTML = `Os compromissos são salvos na agenda <b>${esc(a.sigla)}</b> com código de registro e aparecem também no calendário. A folha se ajusta sozinha para caber em uma página.${canc ? ` <br>${canc} cancelado(s) não entra(m) no documento.` : ''}`;
+  if (document.fonts && document.fonts.status !== 'loaded') document.fonts.ready.then(() => { exCaber(pg); exAjustarPalco(); });
+}
+addEventListener('resize', () => { if (abaAtual === 'executiva') exAjustarPalco(); });
+
+function exResetForm() {
+  ['ex-titulo', 'ex-local', 'ex-part', 'ex-pautas'].forEach(i => $(i).value = '');
+  $('ex-prio').value = '';
+  exEditId = '';
+  $('ex-add-txt').textContent = 'Adicionar à agenda'; $('ex-add-ic').className = 'fa-solid fa-plus';
+  $('ex-cancelar').classList.add('hidden');
+  document.querySelectorAll('.ex-item.editando').forEach(x => x.classList.remove('editando'));
+}
+function exEditar(id) {
+  const e = S.eventos.find(x => x.id === id);
+  if (!e) return;
+  exEditId = id;
+  $('ex-tipo').value = e.modalidade || 'Interna';
+  $('ex-prio').value = e.prioridade === 'Alta' ? 'Alta' : '';
+  const ini = e.inicio || '09:00'; exGarantir($('ex-ini'), ini); $('ex-ini').value = ini; exAtualizarFim(e.fim || '');
+  $('ex-titulo').value = e.titulo || ''; $('ex-local').value = e.local || ''; $('ex-part').value = e.participantes || '';
+  $('ex-pautas').value = String(e.descricao || '').split('\n').map(l => l.replace(/^\s*[-•*▸>]\s*/, '')).join('\n');
+  $('ex-add-txt').textContent = 'Salvar alterações'; $('ex-add-ic').className = 'fa-solid fa-floppy-disk';
+  $('ex-cancelar').classList.remove('hidden');
+  document.querySelectorAll('.ex-item').forEach(x => x.classList.toggle('editando', x.dataset.id === id));
+  if (innerWidth < 1180) $('ex-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  $('ex-titulo').focus();
+}
+async function exSalvar() {
+  const a = exAg();
+  if (!a) return;
+  const base = exEditId ? S.eventos.find(x => x.id === exEditId) || {} : {};
+  const ev = {
+    id: exEditId, agendaId: a.id, data: exData(), titulo: $('ex-titulo').value.trim(), inicio: $('ex-ini').value, fim: $('ex-fim').value, diaInteiro: false,
+    modalidade: $('ex-tipo').value, prioridade: $('ex-prio').value, local: $('ex-local').value.trim(), participantes: $('ex-part').value.trim(),
+    descricao: $('ex-pautas').value.split('\n').map(l => l.trim()).filter(Boolean).join('\n'),
+    tipo: base.tipo || 'Reunião', status: base.status && base.status !== 'Cancelado' ? base.status : 'Confirmado', link: base.link || ''
+  };
+  if (!ev.titulo) { $('ex-titulo').focus(); return toast('Informe o título do compromisso.', 'aviso'); }
+  const b = $('ex-add'), editando = !!exEditId;
+  b.disabled = true; $('ex-add-ic').className = 'fa-solid fa-spinner fa-spin';
+  try {
+    const r = await api('evento_save', { evento: ev });
+    if (!r.semMudanca) {
+      const i = S.eventos.findIndex(x => x.id === r.evento.id);
+      if (i >= 0) S.eventos[i] = r.evento; else S.eventos.push(r.evento);
+      S.eventos.sort(ordenarEv);
+      const desat = r.prevVersion !== S.dataVersion; S.dataVersion = r.dataVersion;
+      if (desat) recarregar(true);
+      atualizarBadgeHoje();
+    }
+    b.classList.add('ok'); $('ex-add-ic').className = 'fa-solid fa-check';
+    $('ex-add-txt').textContent = r.semMudanca ? 'Nada foi alterado' : editando ? 'Alterado com sucesso!' : 'Adicionado!';
+    if (!r.semMudanca) toast((editando ? 'Alterações salvas · ' : 'Compromisso registrado · ') + r.evento.codigo);
+    exEditId = ''; exRender();
+    setTimeout(() => { b.classList.remove('ok'); exResetForm(); }, 1200);
+  } catch (e) { toast(e.message, 'erro'); $('ex-add-ic').className = editando ? 'fa-solid fa-floppy-disk' : 'fa-solid fa-plus'; }
+  finally { b.disabled = false; }
+}
+async function exExcluir(id) {
+  const e = S.eventos.find(x => x.id === id);
+  if (!e) return;
+  const motivo = prompt(`Excluir "${e.titulo}" (${e.codigo})?\n\nO registro fica no histórico. Informe o motivo (opcional) e confirme:`, '');
+  if (motivo === null) return;
+  try {
+    const r = await api('evento_delete', { id, motivo });
+    S.eventos = S.eventos.filter(x => x.id !== id);
+    const desat = r.prevVersion !== S.dataVersion; S.dataVersion = r.dataVersion;
+    if (exEditId === id) exResetForm();
+    exRender(); atualizarBadgeHoje(); toast('Compromisso ' + e.codigo + ' excluído.');
+    if (desat) recarregar(true);
+  } catch (er) { toast(er.message, 'erro'); }
+}
+function carregarScript(url) {
+  return new Promise((ok, falha) => {
+    if (document.querySelector(`script[src="${url}"]`) && window.html2pdf) return ok();
+    const s = document.createElement('script'); s.src = url; s.onload = ok; s.onerror = () => falha(new Error('Não foi possível carregar o gerador de PDF. Verifique a internet.'));
+    document.head.appendChild(s);
+  });
+}
+function exArquivo(a) {
+  const [y, m, d] = exData().split('-');
+  return `Agenda - ${d}-${m}-${y} - ${(a.titular.split(' ')[0] || a.sigla)}.pdf`;
+}
+function exRegistrar(codigo, formato) {
+  const a = exAg(), n = exEventos().length;
+  api('registrar_geracao', { codigo, detalhe: `Agenda Executiva (${formato}) · ${a.sigla} · ${fmtData(exData())} · ${n} compromisso(s)` }).catch(() => {});
+}
+async function exPDF() {
+  if (!perm('exportar')) return toast('Seu perfil não gera documentos.', 'aviso');
+  const a = exAg(); if (!a) return;
+  const b = $('ex-pdf'), orig = b.innerHTML;
+  b.disabled = true; b.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="color:#be185d"></i>Processando...';
+  const box = document.createElement('div');
+  try {
+    await carregarScript(HTML2PDF_URL);
+    if (document.fonts) await document.fonts.ready;
+    const codigo = codigoGeracao();
+    box.style.cssText = 'position:fixed;left:-12000px;top:0;width:210mm;z-index:-1';
+    box.innerHTML = exPaginaHTML({ codigo, acoes: false });
+    document.body.appendChild(box);
+    const pg = box.firstElementChild;
+    pg.style.height = pg.style.minHeight = pg.style.maxHeight = '296mm'; // evita a 2ª página em branco por arredondamento
+    exCaber(pg);
+    await html2pdf().set({
+      margin: 0, filename: exArquivo(a), image: { type: 'jpeg', quality: 1 },
+      html2canvas: { scale: 2, useCORS: true, scrollY: 0, scrollX: 0, backgroundColor: null,
+        onclone: doc => doc.querySelectorAll('.ex-page').forEach(p => { p.style.boxShadow = 'none'; p.style.margin = '0';  }) },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    }).from(pg).save();
+    exRegistrar(codigo, 'PDF'); toast('PDF gerado · ' + codigo);
+  } catch (e) { toast(e.message || 'Falha ao gerar o PDF.', 'erro'); }
+  finally { box.remove(); b.disabled = false; b.innerHTML = orig; }
+}
+function exImprimir() {
+  if (!perm('exportar')) return toast('Seu perfil não gera documentos.', 'aviso');
+  const a = exAg(); if (!a) return;
+  const codigo = codigoGeracao();
+  const fr = document.createElement('iframe');
+  fr.style.cssText = 'position:fixed;right:0;bottom:0;width:210mm;height:297mm;border:0;opacity:0;pointer-events:none';
+  document.body.appendChild(fr);
+  const d = fr.contentDocument;
+  d.open();
+  d.write(`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>${esc(exArquivo(a).replace(/\.pdf$/, ''))}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Lato:wght@300;400;700;900&family=Dancing+Script:wght@600&display=swap">
+    <style>@page{size:A4;margin:0}html,body{margin:0;padding:0;background:#fff}${$('css-executiva').textContent}</style></head><body>${exPaginaHTML({ codigo, acoes: false })}</body></html>`);
+  d.close();
+  const imprimir = () => {
+    try { exCaber(d.querySelector('.ex-page')); fr.contentWindow.focus(); fr.contentWindow.print(); exRegistrar(codigo, 'impressão'); }
+    catch (e) { toast('Não foi possível abrir a impressão.', 'erro'); }
+    setTimeout(() => fr.remove(), 60000);
+  };
+  const pronto = () => (d.fonts ? d.fonts.ready : Promise.resolve()).then(() => setTimeout(imprimir, 250));
+  if (d.readyState === 'complete') pronto(); else fr.onload = pronto;
+}
+
 // =================== CONEXÃO ===================
 function abrirConexao() {
   $('cx-url').value = apiUrl; $('cx-status').classList.add('hidden');
   const ios = /iphone|ipad|ipod/i.test(navigator.userAgent), inst = matchMedia('(display-mode: standalone)').matches || navigator.standalone;
-  $('pwa-instrucoes').innerHTML = inst ? '<div class="aviso info" style="margin:0"><i class="fa-solid fa-circle-check"></i> O GABCalendar já está aberto como aplicativo.</div>'
+  $('pwa-instrucoes').innerHTML = inst ? '<div class="aviso info" style="margin:0"><i class="fa-solid fa-circle-check"></i> O GABAgenda já está aberto como aplicativo.</div>'
     : `<div class="aviso amb" style="margin:0"><b>Instalar no celular ou computador:</b> ${ios ? 'no Safari, toque em <i class="fa-solid fa-arrow-up-from-bracket"></i> Compartilhar › <b>Adicionar à Tela de Início</b>.' : 'no Chrome ou Edge, use o botão <b>Instalar aplicativo</b> acima ou o ícone de instalação na barra de endereço.'}</div>`;
   abrirModal('m-conexao');
 }
@@ -1695,10 +2143,10 @@ async function testarConexao() {
   statusConexao('<i class="fa-solid fa-spinner fa-spin"></i> Testando...', 'info');
   try {
     const d = await (await fetch(u)).json();
-    if (d.app !== 'GABCalendar') throw new Error();
-    statusConexao(`<i class="fa-solid fa-circle-check"></i> Conectado ao backend GABCalendar v${esc(d.versao)}.`, 'info');
+    if (!['GABAgenda', 'GABCalendar'].includes(d.app)) throw new Error();
+    statusConexao(`<i class="fa-solid fa-circle-check"></i> Conectado ao backend GABAgenda v${esc(d.versao)}.`, 'info');
     return true;
-  } catch (e) { statusConexao('<i class="fa-solid fa-triangle-exclamation"></i> Não respondeu como GABCalendar. Confira a implantação ("Qualquer pessoa") e a URL /exec.', 'erro'); return false; }
+  } catch (e) { statusConexao('<i class="fa-solid fa-triangle-exclamation"></i> Não respondeu como GABAgenda. Confira a implantação ("Qualquer pessoa") e a URL /exec.', 'erro'); return false; }
 }
 async function salvarConexao() {
   const u = $('cx-url').value.trim();
@@ -1728,7 +2176,7 @@ function configurarPWA() {
   try {
     const base = location.href.split('#')[0].split('?')[0], escopo = base.replace(/[^/]*$/, '');
     const ic = iconeApp(512), ic192 = iconeApp(192);
-    const man = { name: 'GABCalendar · Agenda do Gabinete', short_name: 'GABCalendar', start_url: base, scope: escopo, display: 'standalone', background_color: '#0f172a', theme_color: '#0f172a', lang: 'pt-BR',
+    const man = { name: 'GABAgenda · Agenda do Gabinete', short_name: 'GABAgenda', start_url: base, scope: escopo, display: 'standalone', background_color: '#0f172a', theme_color: '#0f172a', lang: 'pt-BR',
       icons: [{ src: ic192, sizes: '192x192', type: 'image/png' }, { src: ic, sizes: '512x512', type: 'image/png', purpose: 'any maskable' }] };
     const l = document.createElement('link'); l.rel = 'manifest'; l.href = 'data:application/manifest+json,' + encodeURIComponent(JSON.stringify(man)); document.head.appendChild(l);
     const ap = document.createElement('link'); ap.rel = 'apple-touch-icon'; ap.href = ic192; document.head.appendChild(ap);
@@ -1736,7 +2184,7 @@ function configurarPWA() {
   } catch (e) { /* sem manifesto */ }
   if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('arquivo.js').catch(() => {});
   addEventListener('beforeinstallprompt', e => { e.preventDefault(); promptInstalar = e; });
-  addEventListener('appinstalled', () => { promptInstalar = null; $('btn-instalar').classList.add('hidden'); toast('GABCalendar instalado.'); });
+  addEventListener('appinstalled', () => { promptInstalar = null; $('btn-instalar').classList.add('hidden'); toast('GABAgenda instalado.'); });
   if (matchMedia('(display-mode: standalone)').matches || navigator.standalone) $('btn-instalar').classList.add('hidden');
 }
 async function instalarApp() {

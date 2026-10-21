@@ -1,12 +1,12 @@
 /**
- * GABCalendar — arquivo.js (Service Worker)
- * Permite instalar o GABCalendar como aplicativo (celular e computador) e abrir a tela
+ * GABAgenda — arquivo.js (Service Worker)
+ * Permite instalar o GABAgenda como aplicativo (celular e computador) e abrir a tela
  * mesmo com a internet instável. Os dados da agenda NUNCA ficam em cache: sempre vêm
  * do Apps Script (Google Sheets).
  *
  * Coloque este arquivo na MESMA pasta do index.html (ex.: raiz do repositório no GitHub Pages).
  */
-const VERSAO_CACHE = 'gabcalendar-v1.0.0';
+const VERSAO_CACHE = 'gabagenda-v1.1.0';
 const ESSENCIAIS = ['./', './index.html'];
 const CDN = /(^|\.)(cdnjs\.cloudflare\.com|fonts\.googleapis\.com|fonts\.gstatic\.com|cdn\.jsdelivr\.net)$/;
 
@@ -18,7 +18,7 @@ self.addEventListener('install', (ev) => {
 self.addEventListener('activate', (ev) => {
   ev.waitUntil(
     caches.keys()
-      .then((ks) => Promise.all(ks.filter((k) => k.startsWith('gabcalendar-') && k !== VERSAO_CACHE).map((k) => caches.delete(k))))
+      .then((ks) => Promise.all(ks.filter((k) => k.startsWith('gabagenda-') && k !== VERSAO_CACHE).map((k) => caches.delete(k))))
       .then(() => self.clients.claim())
   );
 });
