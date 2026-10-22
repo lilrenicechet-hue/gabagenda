@@ -121,6 +121,28 @@ main{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden}
 .btn-ic{width:38px;height:38px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;color:var(--mut)}
 .btn-ic:hover{background:var(--soft2);color:var(--tx)}
 #overlay{display:none}
+/* Barra lateral recolhível (somente ícones) */
+#sidebar{position:relative;transition:width .25s ease,transform .3s}
+.nav{white-space:nowrap;overflow:hidden}
+.sb-recolher{position:absolute;top:23px;right:-13px;width:26px;height:26px;border-radius:50%;background:#1e293b;border:1px solid #334155;color:#cbd5e1;font-size:11px;display:flex;align-items:center;justify-content:center;z-index:60;box-shadow:0 4px 10px -4px rgba(0,0,0,.6);transition:.15s}
+.sb-recolher:hover{background:var(--azul);border-color:var(--azul);color:#fff}
+@media(max-width:1023px){.sb-recolher{display:none}}
+@media(min-width:1024px){
+  .app.sb-mini #sidebar{width:76px}
+  .app.sb-mini .sb-topo{padding:0;justify-content:center}
+  .app.sb-mini .sb-nome{display:none}
+  .app.sb-mini .sb-nav{padding:16px 12px;overflow-x:hidden}
+  .app.sb-mini .sb-grupo{font-size:0;height:1px;background:#1f2937;margin:12px 6px}
+  .app.sb-mini .sb-grupo:first-child{display:none}
+  .app.sb-mini .nav{font-size:0;justify-content:center;gap:0;padding:12px 0;position:relative}
+  .app.sb-mini .nav i{font-size:15px;width:auto}
+  .app.sb-mini .nav .bdg{position:absolute;top:3px;right:5px;margin:0;min-width:16px;height:16px;font-size:9px;padding:0 4px}
+  .app.sb-mini .sb-online{margin:0 12px 12px;padding:11px 0;justify-content:center}
+  .app.sb-mini .sb-online #online-txt,.app.sb-mini .sb-online .sb-avs{display:none}
+  .app.sb-mini .sb-pe{flex-direction:column;padding:12px 0;gap:6px}
+  .app.sb-mini .sb-pe>div:nth-child(2){display:none}
+  .app.sb-mini .sb-pe .ac{margin:0;flex-direction:column;align-items:center}
+}
 @media(max-width:1023px){
   #sidebar{position:fixed;inset:0 auto 0 0;transform:translateX(-100%)}
   #sidebar.aberto{transform:none}
@@ -530,6 +552,7 @@ html.escuro #painel-online header{background:linear-gradient(90deg,#0f291d,var(-
   <div id="overlay" onclick="menu(false)"></div>
   <aside id="sidebar" class="padrao">
     <div class="sb-topo"><div class="sb-logo"><i class="fa-solid fa-calendar-days"></i></div><div class="sb-nome">GAB<span>Agenda</span></div></div>
+    <button class="sb-recolher" id="sb-recolher" onclick="alternarSidebar()" title="Recolher menu" aria-label="Recolher menu"><i class="fa-solid fa-angles-left"></i></button>
     <nav class="sb-nav">
       <div class="sb-grupo">Agendas</div>
       <button class="nav" data-tab="agenda" onclick="irPara('agenda')"><i class="fa-solid fa-calendar-days"></i>Agenda integrada</button>
@@ -633,8 +656,11 @@ html.escuro #painel-online header{background:linear-gradient(90deg,#0f291d,var(-
             </div>
             <div class="ex-sec"><b>2</b><span>Horário</span></div>
             <div class="form-g">
-              <div><label class="lb" for="ex-ini">Início</label><select class="inp" id="ex-ini" onchange="exAtualizarFim()"></select></div>
-              <div><label class="lb" for="ex-fim">Fim</label><select class="inp" id="ex-fim"></select></div>
+              <div><label class="lb" for="ex-ini">Início</label><input type="time" class="inp" id="ex-ini" step="60" value="09:00" onchange="exAtualizarFim()"></div>
+              <div><label class="lb" for="ex-fim">Fim</label><input type="time" class="inp" id="ex-fim" step="60" value="10:00"></div>
+            </div>
+            <div class="ex-rapidos" id="ex-duracoes" style="align-items:center"><span style="font-size:11px;font-weight:700;color:var(--mut);margin-right:2px">Duração:</span>
+              <button type="button" onclick="exDuracao(15,this)">15 min</button><button type="button" onclick="exDuracao(30,this)">30 min</button><button type="button" onclick="exDuracao(45,this)">45 min</button><button type="button" onclick="exDuracao(60,this)">1 h</button><button type="button" onclick="exDuracao(90,this)">1h30</button><button type="button" onclick="exDuracao(120,this)">2 h</button><button type="button" onclick="exDuracao(180,this)">3 h</button>
             </div>
             <div class="ex-sec"><b>3</b><span>Título</span></div>
             <div style="display:flex;gap:8px"><input class="inp" id="ex-titulo" list="ex-dl-titulos" maxlength="200" placeholder="Selecione ou digite..." style="flex:1"><button type="button" class="ex-limpar" title="Limpar" onclick="$('ex-titulo').value='';$('ex-titulo').focus()"><i class="fa-solid fa-eraser"></i></button></div>
@@ -652,6 +678,11 @@ html.escuro #painel-online header{background:linear-gradient(90deg,#0f291d,var(-
             <button type="button" class="btn btn-s hidden" id="ex-cancelar" style="width:100%;margin-top:8px" onclick="exResetForm()"><i class="fa-solid fa-xmark"></i>Cancelar edição</button>
           </div>
           <p id="ex-info" style="font-size:12px;color:var(--mut);margin:14px 0 0;line-height:1.5"></p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid var(--line2)">
+            <button type="button" class="btn btn-s" onclick="exBackupSalvar()" title="Baixar os compromissos deste dia em um arquivo .json"><i class="fa-solid fa-download" style="color:#4f46e5"></i>Salvar backup</button>
+            <button type="button" class="btn btn-s" id="ex-bkp-ler" onclick="$('ex-bkp-arq').click()" title="Carregar um arquivo .json de backup para este dia"><i class="fa-solid fa-upload" style="color:#2563eb"></i>Ler backup</button>
+            <input type="file" id="ex-bkp-arq" accept=".json,application/json" class="hidden" onchange="exBackupLer(event)">
+          </div>
         </div>
         <div class="ex-prev">
           <div class="ex-prev-barra">
@@ -1117,6 +1148,18 @@ function renderAtual() {
   else if (abaAtual === 'admin' && admSecao === 'online') renderAdmOnline();
 }
 function menu(on) { $('sidebar').classList.toggle('aberto', on); $('overlay').classList.toggle('aberto', on); }
+/** Recolhe a barra lateral (computador), deixando só os ícones. A escolha fica salva neste aparelho. */
+function alternarSidebar(forcar) {
+  const mini = typeof forcar === 'boolean' ? forcar : !$('app').classList.contains('sb-mini');
+  $('app').classList.toggle('sb-mini', mini);
+  ls.set('gcal_sb', mini ? 'mini' : '');
+  const b = $('sb-recolher');
+  b.querySelector('i').className = `fa-solid ${mini ? 'fa-angles-right' : 'fa-angles-left'}`;
+  b.title = mini ? 'Expandir menu' : 'Recolher menu'; b.setAttribute('aria-label', b.title);
+}
+document.querySelectorAll('#sidebar .nav').forEach(b => { if (!b.title) b.title = b.textContent.trim(); });
+$('sidebar').addEventListener('transitionend', e => { if (e.propertyName === 'width') dispatchEvent(new Event('resize')); });
+alternarSidebar(ls.get('gcal_sb') === 'mini');
 
 // =================== PRESENÇA E MONITOR DE VERSÃO ===================
 function iniciarPing() { pararPing(); pingTimer = setTimeout(pingLoop, 1500); }
@@ -1146,6 +1189,7 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden) ping
 function renderOnline() {
   const l = S.online || [], n = new Set(l.map(o => o.usuario)).size;
   $('online-txt').textContent = n === 1 ? '1 online' : `${n} online`;
+  document.querySelector('.sb-online').title = `Quem está online (${n})`;
   const unicos = []; l.forEach(o => { if (!unicos.some(u => u.usuario === o.usuario)) unicos.push(o); });
   $('online-avs').innerHTML = unicos.slice(0, 4).map(o => `<span style="${corAv(o.usuario)}" title="${esc(o.usuario)}">${esc(iniciais(o.usuario))}</span>`).join('');
   if (!$('painel-online').classList.contains('hidden')) renderPainelOnline();
@@ -1864,7 +1908,7 @@ const EX_LOCAIS = ['Sala de Reuniões Gabinete SEDUC', 'Gabinete Sec. Flavia', '
 const EX_PART = [['Sec. Flavia'], ['Sec. Christina'], ['Sec. Adriana'], ['Sec. Ane'], ['Sec. Matheus'], ['Sec. Geonir'], ['Sec. Hesloan'], ['Sec. Danielle'],
   ['Gov. Pivetta', 'Gov. Otaviano Pivetta'], ['Adjaime'], ['Sec. Gallo', 'Sec. Rogério Gallo'], ['Equipe']];
 const HTML2PDF_URL = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
-let exFrase = EX_FRASES[Math.floor(Math.random() * EX_FRASES.length)], exEditId = '', exPronto = false;
+let exFrase = EX_FRASES[Math.floor(Math.random() * EX_FRASES.length)], exEditId = '';
 
 const hexRgb = h => { const n = parseInt(String(h).slice(1), 16) || 0; return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
 function misturar(h, alvo, t) { const a = hexRgb(h), b = hexRgb(alvo); return '#' + a.map((v, i) => Math.round(v + (b[i] - v) * t).toString(16).padStart(2, '0')).join(''); }
@@ -1880,14 +1924,15 @@ function exDataLonga(d) {
   return dISO(d).toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
     .split(' ').map(w => w === 'de' ? w : w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 }
-function exHorarios() { const o = []; for (let h = 6; h <= 23; h++) { o.push(pad(h) + ':00'); if (h !== 23) o.push(pad(h) + ':30'); } return o; }
-function exGarantir(sel, v) { if (v && ![...sel.options].some(o => o.value === v)) { sel.add(new Option(v, v)); [...sel.options].sort((a, b) => a.value.localeCompare(b.value)).forEach(o => sel.add(o)); } }
-function exAtualizarFim(alvo) {
-  const ini = $('ex-ini').value, sel = $('ex-fim'), atual = alvo || sel.value;
-  sel.innerHTML = exHorarios().filter(t => t > ini).map(t => `<option>${t}</option>`).join('');
-  if (alvo) exGarantir(sel, alvo);
-  if (atual && [...sel.options].some(o => o.value === atual) && atual > ini) sel.value = atual;
-  else { const um = somarHora(ini, 60); sel.value = [...sel.options].some(o => o.value === um) ? um : (sel.options[0] || {}).value || ''; }
+function exAtualizarFim() {
+  const ini = $('ex-ini').value, fim = $('ex-fim').value;
+  if (ini && (!fim || fim <= ini)) $('ex-fim').value = somarHora(ini, 60);
+}
+function exDuracao(min, btn) {
+  const ini = $('ex-ini').value;
+  if (!ini) { $('ex-ini').focus(); return toast('Informe primeiro o horário de início.', 'aviso'); }
+  $('ex-fim').value = somarHora(ini, min);
+  if (btn) { btn.classList.add('pulso'); setTimeout(() => btn.classList.remove('pulso'), 160); }
 }
 function exRapido(campo, valor, sep, btn) {
   const i = $(campo); i.value = i.value.trim() ? i.value.trim() + sep + valor : valor;
@@ -1899,11 +1944,6 @@ function exPreparar() {
   sel.innerHTML = ags.map(a => `<option value="${esc(a.id)}">${esc(a.sigla)} · ${esc(a.titular)}</option>`).join('');
   sel.value = padrao;
   if (!$('ex-data').value) $('ex-data').value = V.dia || hojeISO();
-  if (!exPronto) {
-    $('ex-ini').innerHTML = exHorarios().filter(t => t !== '23:00').map(t => `<option>${t}</option>`).join('');
-    $('ex-ini').value = '09:00'; exAtualizarFim();
-    exPronto = true;
-  }
   const locais = [...new Set([...EX_LOCAIS, ...S.eventos.map(e => e.local).filter(Boolean)])].slice(0, 80);
   $('ex-dl-locais').innerHTML = locais.map(l => `<option value="${esc(l)}">`).join('');
   $('ex-dl-titulos').innerHTML = [...new Set([...EX_TITULOS, ...S.eventos.map(e => e.titulo)])].slice(0, 80).map(t => `<option value="${esc(t)}">`).join('');
@@ -1984,6 +2024,7 @@ function exRender() {
   $('ex-nome').placeholder = (a.cargo ? a.cargo + ' ' : '') + a.titular;
   const podeCriar = podeEditarAg(a.id, true) || (exEditId && podeEditarAg(a.id, false));
   $('ex-campos').classList.toggle('hidden', !podeCriar); $('ex-sem-perm').classList.toggle('hidden', !!podeCriar);
+  $('ex-bkp-ler').classList.toggle('hidden', !podeEditarAg(a.id, true));
   $('ex-palco').innerHTML = exPaginaHTML();
   const pg = $('ex-palco').querySelector('.ex-page');
   exCaber(pg); exAjustarPalco();
@@ -2009,7 +2050,7 @@ function exEditar(id) {
   exEditId = id;
   $('ex-tipo').value = e.modalidade || 'Interna';
   $('ex-prio').value = e.prioridade === 'Alta' ? 'Alta' : '';
-  const ini = e.inicio || '09:00'; exGarantir($('ex-ini'), ini); $('ex-ini').value = ini; exAtualizarFim(e.fim || '');
+  $('ex-ini').value = e.inicio || '09:00'; $('ex-fim').value = e.fim || ''; exAtualizarFim();
   $('ex-titulo').value = e.titulo || ''; $('ex-local').value = e.local || ''; $('ex-part').value = e.participantes || '';
   $('ex-pautas').value = String(e.descricao || '').split('\n').map(l => l.replace(/^\s*[-•*▸>]\s*/, '')).join('\n');
   $('ex-add-txt').textContent = 'Salvar alterações'; $('ex-add-ic').className = 'fa-solid fa-floppy-disk';
@@ -2029,6 +2070,8 @@ async function exSalvar() {
     tipo: base.tipo || 'Reunião', status: base.status && base.status !== 'Cancelado' ? base.status : 'Confirmado', link: base.link || ''
   };
   if (!ev.titulo) { $('ex-titulo').focus(); return toast('Informe o título do compromisso.', 'aviso'); }
+  if (!ev.inicio) { $('ex-ini').focus(); return toast('Informe o horário de início.', 'aviso'); }
+  if (ev.fim && ev.fim <= ev.inicio) { $('ex-fim').focus(); return toast('O horário de fim deve ser depois do início.', 'aviso'); }
   const b = $('ex-add'), editando = !!exEditId;
   b.disabled = true; $('ex-add-ic').className = 'fa-solid fa-spinner fa-spin';
   try {
@@ -2062,6 +2105,68 @@ async function exExcluir(id) {
     exRender(); atualizarBadgeHoje(); toast('Compromisso ' + e.codigo + ' excluído.');
     if (desat) recarregar(true);
   } catch (er) { toast(er.message, 'erro'); }
+}
+// ---------- Backup (.json) — mesmo formato do arquivo da Agenda Executiva original ----------
+function exBackupSalvar() {
+  const a = exAg(); if (!a) return;
+  const evs = exEventos();
+  if (!evs.length && !confirm('A agenda deste dia está vazia. Deseja baixar um arquivo vazio mesmo assim?')) return;
+  const dados = evs.map(e => ({
+    timeStart: e.inicio || '', timeEnd: e.fim || '', type: e.modalidade || 'Interna', title: e.titulo,
+    location: e.local || '', participants: e.participantes || '',
+    pautas: String(e.descricao || '').split('\n').map(l => l.trim()).filter(Boolean),
+    priority: e.prioridade === 'Alta' ? 'Agenda com Prioridade' : '',
+    // campos extras do GABAgenda (o sistema antigo ignora)
+    codigo: e.codigo, agenda: a.sigla, data: e.data, status: e.status
+  }));
+  const url = URL.createObjectURL(new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' })), l = document.createElement('a');
+  l.href = url; l.download = `agenda_backup_${exData()}_${a.sigla}.json`; document.body.appendChild(l); l.click(); l.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+  toast(`Backup salvo · ${evs.length} compromisso${evs.length === 1 ? '' : 's'}.`);
+}
+const exHora = v => { const m = String(v || '').match(/^(\d{1,2}):(\d{2})/); return m && +m[1] < 24 && +m[2] < 60 ? pad(+m[1]) + ':' + m[2] : ''; };
+function exBackupItem(x) {
+  const pautas = Array.isArray(x.pautas) ? x.pautas.join('\n') : (x.descricao || '');
+  const mod = ['Interna', 'Externa', 'Online'].includes(x.type) ? x.type : ['Interna', 'Externa', 'Online'].includes(x.modalidade) ? x.modalidade : '';
+  return {
+    titulo: String(x.title || x.titulo || '').trim() || '(Sem título)', inicio: exHora(x.timeStart || x.inicio), fim: exHora(x.timeEnd || x.fim),
+    modalidade: mod, prioridade: (x.priority || x.prioridade === 'Alta') ? 'Alta' : '', local: String(x.location || x.local || '').trim(),
+    participantes: String(x.participants || x.participantes || '').trim(), descricao: String(pautas).trim(),
+    status: ['Confirmado', 'Pendente', 'Realizado'].includes(x.status) ? x.status : 'Confirmado'
+  };
+}
+async function exBackupLer(ev) {
+  const arq = ev.target.files[0]; ev.target.value = '';
+  if (!arq) return;
+  const a = exAg(); if (!a) return;
+  if (!podeEditarAg(a.id, true)) return toast('Seu perfil não permite criar compromissos nesta agenda.', 'aviso');
+  let lista;
+  try { lista = JSON.parse(await arq.text()); } catch (e) { return toast('Erro ao ler o arquivo. Use um backup (.json) gerado pela Agenda.', 'erro'); }
+  if (!Array.isArray(lista)) return toast('O arquivo não contém um formato de agenda válido.', 'erro');
+  const itens = lista.filter(x => x && typeof x === 'object').map(exBackupItem);
+  if (!itens.length) return toast('O arquivo não tem compromissos.', 'aviso');
+  const ja = exEventos(), chave = e => (e.inicio || '') + '|' + normTxt(e.titulo);
+  const novos = itens.filter(i => !ja.some(e => chave(e) === chave(i)));
+  const repetidos = itens.length - novos.length;
+  if (!novos.length) return toast('Todos os compromissos do arquivo já estão nesta agenda.', 'aviso');
+  if (!confirm(`Importar ${novos.length} compromisso(s) para a agenda ${a.sigla} em ${fmtData(exData())}?` +
+    (repetidos ? `\n\n${repetidos} já existe(m) neste dia e será(ão) ignorado(s).` : '') +
+    '\n\nEles serão gravados na planilha, cada um com seu código de registro.')) return;
+  carregando(true, 'Lendo backup', `Gravando 0 de ${novos.length}...`);
+  let ok = 0; const falhas = [];
+  for (const i of novos) {
+    $('carr-desc').textContent = `Gravando ${ok + 1} de ${novos.length}...`;
+    try {
+      const r = await api('evento_save', { evento: Object.assign({ agendaId: a.id, data: exData(), tipo: 'Reunião', diaInteiro: !i.inicio, link: '' }, i) });
+      const k = S.eventos.findIndex(x => x.id === r.evento.id);
+      if (k >= 0) S.eventos[k] = r.evento; else S.eventos.push(r.evento);
+      S.dataVersion = r.dataVersion; ok++;
+    } catch (e) { falhas.push(`${i.inicio || '--:--'} ${i.titulo}: ${e.message}`); }
+  }
+  carregando(false);
+  S.eventos.sort(ordenarEv); exRender(); atualizarBadgeHoje();
+  toast(`Backup lido: ${ok} compromisso(s) gravado(s)${falhas.length ? `, ${falhas.length} com erro` : ''}.`, falhas.length ? 'aviso' : 'ok');
+  if (falhas.length) alert('Não foi possível gravar:\n\n' + falhas.join('\n'));
 }
 function carregarScript(url) {
   return new Promise((ok, falha) => {
@@ -2200,6 +2305,7 @@ document.addEventListener('keydown', e => {
     fecharOnline(); menu(false); return;
   }
   if (!S.eu || $('app').classList.contains('hidden') || modalAberto() || /input|select|textarea/i.test(e.target.tagName) || e.ctrlKey || e.metaKey || e.altKey) return;
+  if (e.key === '[') { alternarSidebar(); return; }
   if (abaAtual === 'agenda') {
     if (e.key === 'ArrowLeft') navegar(-1); else if (e.key === 'ArrowRight') navegar(1);
     else if (e.key === 't' || e.key === 'T') irHoje();
