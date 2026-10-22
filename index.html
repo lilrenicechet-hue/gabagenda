@@ -428,6 +428,26 @@ html.escuro #painel-online header{background:linear-gradient(90deg,#0f291d,var(-
 .ex-prev-barra{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
 .ex-palco{position:relative;margin:0 auto}
 .ex-palco>.ex-page{position:absolute;top:0;left:0;transform-origin:top left;box-shadow:0 20px 25px -5px rgba(0,0,0,.15),0 10px 10px -5px rgba(0,0,0,.05)}
+/* Configurações e minutas */
+.nav.desligada{display:none!important}
+.cfg-grade{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:14px;align-items:start;margin-top:14px}
+.cfg-cab{display:flex;gap:10px;align-items:center;margin-bottom:12px}
+.cfg-cab .ic{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--c);background:color-mix(in srgb,var(--c) 13%,transparent);flex-shrink:0}
+.cfg-cab h4{margin:0;font-size:14px;font-weight:800}.cfg-cab p{margin:1px 0 0;font-size:11.5px;color:var(--mut)}
+.cfg-corpo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.cfg-corpo .campo .inp{width:100%}
+.cfg-full{grid-column:1/-1}
+@media(max-width:520px){.cfg-corpo{grid-template-columns:1fr}}
+.cfg-pag{display:flex;align-items:center;gap:10px}.cfg-pag>i{width:18px;text-align:center;color:var(--mut)}.cfg-pag .inp{flex:1}
+.cfg-eq{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.6fr) 38px;gap:8px;margin-bottom:8px}
+@media(max-width:520px){.cfg-eq{grid-template-columns:1fr 38px}.cfg-eq .inp:nth-child(2){grid-column:1/2}}
+.cfg-barra{position:sticky;bottom:0;margin-top:14px;z-index:5;flex-wrap:wrap;box-shadow:0 -8px 20px -16px rgba(15,23,42,.5)}
+#cfg-salvar.pulsar{box-shadow:0 0 0 3px color-mix(in srgb,var(--azul) 35%,transparent)}
+.minuta-st{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--mut);font-weight:600}
+.minuta-st i{color:var(--verde)}
+.minuta-st button{color:var(--azul);font-weight:700;font-size:11.5px;margin-left:4px}
+#ev-minuta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+#ev-equipes{margin-top:6px}
 @media(max-width:640px){.sr-hide{display:none}.cal-topo h3{font-size:15px}}
 @media print{body *{visibility:hidden}}
 </style>
@@ -522,14 +542,14 @@ html.escuro #painel-online header{background:linear-gradient(90deg,#0f291d,var(-
   <div class="marca">
     <div class="marca-in">
       <div class="logo-grande"><i class="fa-solid fa-calendar-days"></i></div>
-      <div><h1 class="logo-txt">GAB<span>Agenda</span></h1><p>Agenda integrada do gabinete</p></div>
+      <div><h1 class="logo-txt" id="id-logo">GAB<span>Agenda</span></h1><p id="id-sub">Agenda integrada do gabinete</p></div>
     </div>
   </div>
   <div class="lado">
-    <div class="inst"><b>Governo de Mato Grosso</b><span>Secretaria de Estado de Educação</span><small>Gabinete do Secretário · Secretarias Adjuntas</small></div>
+    <div class="inst" id="id-inst"><b>Governo de Mato Grosso</b><span>Secretaria de Estado de Educação</span><small>Gabinete do Secretário · Secretarias Adjuntas</small></div>
     <div class="form-login"><div>
-      <h2>Acesso às agendas</h2>
-      <p class="sub">Entre com o seu usuário e senha para ver e organizar os compromissos do gabinete.</p>
+      <h2 id="id-login-tit">Acesso às agendas</h2>
+      <p class="sub" id="id-login-txt">Entre com o seu usuário e senha para ver e organizar os compromissos do gabinete.</p>
       <form onsubmit="event.preventDefault(); entrar();" autocomplete="on">
         <div id="login-aviso" class="aviso hidden"></div>
         <div class="campo-ico"><i class="fa-regular fa-user"></i>
@@ -542,7 +562,7 @@ html.escuro #painel-online header{background:linear-gradient(90deg,#0f291d,var(-
         <button type="submit" id="btn-entrar" class="btn-entrar"><span>Entrar no sistema</span><i class="fa-solid fa-arrow-right-to-bracket"></i></button>
       </form>
       <p class="link-mini">Esqueceu a senha? Procure a administração do sistema.<br><button type="button" onclick="abrirConexao()"><i class="fa-solid fa-plug"></i> Configurar conexão com a planilha</button></p>
-      <div class="rodape-login">SEDUC/MT · GABAgenda · <span id="ano-atual"></span></div>
+      <div class="rodape-login"><span id="id-rodape">SEDUC/MT · GABAgenda</span> · <span id="ano-atual"></span></div>
     </div></div>
   </div>
 </div>
@@ -551,7 +571,7 @@ html.escuro #painel-online header{background:linear-gradient(90deg,#0f291d,var(-
 <div id="app" class="app hidden">
   <div id="overlay" onclick="menu(false)"></div>
   <aside id="sidebar" class="padrao">
-    <div class="sb-topo"><div class="sb-logo"><i class="fa-solid fa-calendar-days"></i></div><div class="sb-nome">GAB<span>Agenda</span></div></div>
+    <div class="sb-topo"><div class="sb-logo"><i class="fa-solid fa-calendar-days"></i></div><div class="sb-nome" id="id-sb-nome">GAB<span>Agenda</span></div></div>
     <button class="sb-recolher" id="sb-recolher" onclick="alternarSidebar()" title="Recolher menu" aria-label="Recolher menu"><i class="fa-solid fa-angles-left"></i></button>
     <nav class="sb-nav">
       <div class="sb-grupo">Agendas</div>
@@ -580,7 +600,7 @@ html.escuro #painel-online header{background:linear-gradient(90deg,#0f291d,var(-
 
   <main>
     <header class="topo-m">
-      <div style="display:flex;align-items:center;gap:6px"><button class="btn-ic" onclick="menu(true)" aria-label="Menu"><i class="fa-solid fa-bars"></i></button><h1>GAB<span>Agenda</span></h1></div>
+      <div style="display:flex;align-items:center;gap:6px"><button class="btn-ic" onclick="menu(true)" aria-label="Menu"><i class="fa-solid fa-bars"></i></button><h1 id="id-topo-nome">GAB<span>Agenda</span></h1></div>
       <div style="display:flex;gap:4px"><button class="btn-ic" onclick="alternarOnline(this)" aria-label="Online"><i class="fa-solid fa-user-group"></i></button><button class="btn-ic" data-perm="criar" onclick="novoEvento()" aria-label="Novo compromisso" style="background:var(--azul);color:#fff"><i class="fa-solid fa-plus"></i></button></div>
     </header>
 
@@ -663,18 +683,20 @@ html.escuro #painel-online header{background:linear-gradient(90deg,#0f291d,var(-
               <button type="button" onclick="exDuracao(15,this)">15 min</button><button type="button" onclick="exDuracao(30,this)">30 min</button><button type="button" onclick="exDuracao(45,this)">45 min</button><button type="button" onclick="exDuracao(60,this)">1 h</button><button type="button" onclick="exDuracao(90,this)">1h30</button><button type="button" onclick="exDuracao(120,this)">2 h</button><button type="button" onclick="exDuracao(180,this)">3 h</button>
             </div>
             <div class="ex-sec"><b>3</b><span>Título</span></div>
-            <div style="display:flex;gap:8px"><input class="inp" id="ex-titulo" list="ex-dl-titulos" maxlength="200" placeholder="Selecione ou digite..." style="flex:1"><button type="button" class="ex-limpar" title="Limpar" onclick="$('ex-titulo').value='';$('ex-titulo').focus()"><i class="fa-solid fa-eraser"></i></button></div>
-            <datalist id="ex-dl-titulos"></datalist>
+            <div style="display:flex;gap:8px"><input class="inp" id="ex-titulo" list="dl-titulos" maxlength="200" placeholder="Selecione ou digite..." style="flex:1"><button type="button" class="ex-limpar" title="Limpar" onclick="$('ex-titulo').value='';$('ex-titulo').focus()"><i class="fa-solid fa-eraser"></i></button></div>
+            
             <div class="ex-rapidos" id="ex-rap-titulos"></div>
             <div class="ex-sec"><b>4</b><span>Local e participantes</span></div>
             <label class="lb" for="ex-local">Local</label>
-            <input class="inp" id="ex-local" list="ex-dl-locais" maxlength="300" placeholder="Selecione ou digite..." style="width:100%"><datalist id="ex-dl-locais"></datalist>
+            <input class="inp" id="ex-local" list="dl-locais" maxlength="300" placeholder="Selecione ou digite..." style="width:100%">
             <label class="lb" for="ex-part" style="margin-top:12px">Participantes</label>
             <div style="display:flex;gap:8px"><input class="inp" id="ex-part" maxlength="800" placeholder="Ex.: Diretores..." style="flex:1"><button type="button" class="ex-limpar" title="Limpar" onclick="$('ex-part').value='';$('ex-part').focus()"><i class="fa-solid fa-eraser"></i></button></div>
             <div class="ex-rapidos" id="ex-rap-part"></div>
+            <div class="ex-rapidos hidden" id="ex-rap-equipes" style="align-items:center"></div>
             <div class="ex-sec"><b>5</b><span>Pautas</span></div>
             <textarea class="inp" id="ex-pautas" rows="4" maxlength="4000" placeholder="Lista de tópicos (um por linha)..." style="width:100%"></textarea>
             <button type="button" class="ex-btn-add" id="ex-add" onclick="exSalvar()"><i class="fa-solid fa-plus" id="ex-add-ic"></i><span id="ex-add-txt">Adicionar à agenda</span></button>
+            <div class="minuta-st hidden" id="ex-minuta" style="margin-top:8px;width:100%;justify-content:center"></div>
             <button type="button" class="btn btn-s hidden" id="ex-cancelar" style="width:100%;margin-top:8px" onclick="exResetForm()"><i class="fa-solid fa-xmark"></i>Cancelar edição</button>
           </div>
           <p id="ex-info" style="font-size:12px;color:var(--mut);margin:14px 0 0;line-height:1.5"></p>
@@ -740,7 +762,7 @@ html.escuro #painel-online header{background:linear-gradient(90deg,#0f291d,var(-
             <div class="inp-ico" style="flex:1;min-width:200px"><i class="fa-solid fa-barcode"></i><input class="inp" id="h-busca" placeholder="Código de registro (GCAL-...), pessoa ou texto" onkeydown="if(event.key==='Enter')carregarHistorico()"></div>
             <select class="inp" id="h-usuario" onchange="carregarHistorico()"><option value="">Todas as pessoas</option></select>
             <select class="inp" id="h-agenda" onchange="carregarHistorico()"><option value="">Todas as agendas</option></select>
-            <select class="inp" id="h-acao" onchange="carregarHistorico()"><option value="">Todas as ações</option><option>Criado</option><option>Alterado</option><option>Excluído</option><option>Relatório</option><option>Acesso</option><option>Usuário</option><option>Agendas</option><option>Camadas</option></select>
+            <select class="inp" id="h-acao" onchange="carregarHistorico()"><option value="">Todas as ações</option><option>Criado</option><option>Alterado</option><option>Excluído</option><option>Relatório</option><option>Acesso</option><option>Usuário</option><option>Agendas</option><option>Camadas</option><option>Configurações</option></select>
             <button class="btn btn-p" onclick="carregarHistorico()"><i class="fa-solid fa-magnifying-glass"></i>Buscar</button>
           </div>
           <div class="l2"><div class="seg" id="h-periodo">
@@ -763,6 +785,7 @@ html.escuro #painel-online header{background:linear-gradient(90deg,#0f291d,var(-
           <button data-s="online" onclick="admIr('online')"><i class="fa-solid fa-signal"></i>Online agora</button>
           <button data-s="agendas" onclick="admIr('agendas')"><i class="fa-solid fa-palette"></i>Agendas e cores</button>
           <button data-s="camadas" onclick="admIr('camadas')"><i class="fa-solid fa-layer-group"></i>Camadas de acesso</button>
+          <button data-s="config" onclick="admIr('config')"><i class="fa-solid fa-sliders"></i>Configurações</button>
         </div>
         <div id="adm-conteudo"></div>
       </div>
@@ -779,10 +802,11 @@ html.escuro #painel-online header{background:linear-gradient(90deg,#0f291d,var(-
     </div>
     <div class="m-corpo">
       <input type="hidden" id="ev-id">
+      <div id="ev-minuta" class="aviso amb hidden"></div>
       <div id="ev-leitura" class="aviso info hidden"><i class="fa-solid fa-lock"></i> Somente leitura: seu perfil não permite alterar esta agenda.</div>
       <div class="form-g">
         <div class="full"><span class="lb">Agenda <span class="req">*</span></span><div class="ag-op" id="ev-agendas"></div></div>
-        <div class="full"><label class="lb" for="ev-titulo">Título <span class="req">*</span></label><input class="inp" id="ev-titulo" maxlength="200" placeholder="Ex.: Reunião com diretores regionais" oninput="checarConflito()"></div>
+        <div class="full"><label class="lb" for="ev-titulo">Título <span class="req">*</span></label><input class="inp" id="ev-titulo" list="dl-titulos" maxlength="200" placeholder="Ex.: Reunião com diretores regionais" oninput="checarConflito()"></div>
         <div><label class="lb" for="ev-tipo">Tipo</label><select class="inp" id="ev-tipo"></select></div>
         <div><label class="lb" for="ev-status">Situação</label><select class="inp" id="ev-status"><option>Confirmado</option><option>Pendente</option><option>Realizado</option><option>Cancelado</option></select></div>
         <div><label class="lb" for="ev-modalidade">Modalidade</label><select class="inp" id="ev-modalidade"><option value="">Não informada</option><option>Interna</option><option>Externa</option><option>Online</option></select></div>
@@ -794,15 +818,15 @@ html.escuro #painel-online header{background:linear-gradient(90deg,#0f291d,var(-
         </div>
         <div class="full"><label style="display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;cursor:pointer"><input type="checkbox" id="ev-dia-inteiro" onchange="alternarDiaInteiro()"> Dia inteiro</label></div>
         <div id="ev-conflito" class="full alerta-conf hidden"></div>
-        <div><label class="lb" for="ev-local">Local</label><div class="inp-ico"><i class="fa-solid fa-location-dot"></i><input class="inp" id="ev-local" maxlength="300" placeholder="Sala, endereço ou cidade"></div></div>
+        <div><label class="lb" for="ev-local">Local</label><div class="inp-ico"><i class="fa-solid fa-location-dot"></i><input class="inp" id="ev-local" list="dl-locais" maxlength="300" placeholder="Sala, endereço ou cidade"></div></div>
         <div><label class="lb" for="ev-link">Link da reunião</label><div class="inp-ico"><i class="fa-solid fa-video"></i><input type="url" class="inp" id="ev-link" placeholder="https://"></div></div>
-        <div class="full"><label class="lb" for="ev-participantes">Participantes</label><div class="inp-ico"><i class="fa-solid fa-users"></i><input class="inp" id="ev-participantes" list="dl-pessoas" maxlength="800" placeholder="Nomes separados por vírgula"></div><datalist id="dl-pessoas"></datalist></div>
+        <div class="full"><label class="lb" for="ev-participantes">Participantes</label><div class="inp-ico"><i class="fa-solid fa-users"></i><input class="inp" id="ev-participantes" list="dl-pessoas" maxlength="800" placeholder="Nomes separados por vírgula"></div><datalist id="dl-pessoas"></datalist><div class="ex-rapidos hidden" id="ev-equipes" style="align-items:center"></div></div>
         <div class="full"><label class="lb" for="ev-descricao">Pauta / observações</label><textarea class="inp" id="ev-descricao" rows="3" maxlength="4000" placeholder="Assuntos, documentos, orientações"></textarea></div>
       </div>
       <div id="ev-registro" class="hist-min hidden"></div>
     </div>
     <div class="m-pe">
-      <div class="esq"><button class="btn btn-perigo hidden" id="ev-excluir" onclick="excluirEvento()"><i class="fa-solid fa-trash-can"></i>Excluir</button><button class="btn btn-s hidden" id="ev-duplicar" onclick="duplicarEvento()"><i class="fa-regular fa-copy"></i>Duplicar</button></div>
+      <div class="esq"><button class="btn btn-perigo hidden" id="ev-excluir" onclick="excluirEvento()"><i class="fa-solid fa-trash-can"></i>Excluir</button><button class="btn btn-s hidden" id="ev-duplicar" onclick="duplicarEvento()"><i class="fa-regular fa-copy"></i>Duplicar</button><span class="minuta-st" id="ev-minuta-st"></span></div>
       <button class="btn btn-s" onclick="fecharModal('m-evento')">Fechar</button>
       <button class="btn btn-p" id="ev-salvar" onclick="salvarEvento()"><i class="fa-solid fa-floppy-disk"></i>Salvar</button>
     </div>
@@ -873,18 +897,51 @@ html.escuro #painel-online header{background:linear-gradient(90deg,#0f291d,var(-
   <div id="po-lista" style="max-height:340px;overflow-y:auto"></div>
 </div>
 
+<datalist id="dl-locais"></datalist><datalist id="dl-titulos"></datalist>
 <div id="toast"><i id="toast-ic" class="fa-solid fa-circle-check" style="color:#4ade80"></i><span id="toast-msg"></span></div>
 <div id="carregando"><div class="carr-box">
   <div class="anel"><svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="36" fill="none" stroke="#e2e8f0" stroke-width="4"/><circle cx="40" cy="40" r="36" fill="none" stroke="#3b82f6" stroke-width="4" stroke-linecap="round" stroke-dasharray="70 226"/></svg><div><i class="fa-solid fa-calendar-days"></i></div></div>
-  <small>GAB<span style="color:var(--azul)">AGENDA</span></small><h3 id="carr-tit">Aguarde...</h3><p id="carr-desc">Carregando.</p>
+  <small id="id-carr">GAB<span style="color:var(--azul)">AGENDA</span></small><h3 id="carr-tit">Aguarde...</h3><p id="carr-desc">Carregando.</p>
 </div></div>
 
 <script>
 // =================== CONFIGURAÇÃO ===================
 // Cole aqui a URL /exec do Apps Script para que todos usem o mesmo endereço sem configurar.
 const URL_APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbyw7l7L6je29IROxu1YSBccyW5j58LJw5CKwW5DSG205kLy62bii6zBtIoC_Z2Kqv50Jw/exec';
-const VERSAO = '1.1.0';
-const TIPOS = ['Reunião', 'Audiência', 'Agenda externa', 'Evento', 'Videoconferência', 'Despacho interno', 'Visita', 'Viagem', 'Outro'];
+const VERSAO = '1.2.0';
+// Padrões das configurações (iguais aos do code.gs; os valores reais vêm da planilha ao entrar)
+const CONFIG_PADRAO = {
+  identidade: { nomeA: 'GAB', nomeB: 'Agenda', subtitulo: 'Agenda integrada do gabinete', governo: 'Governo de Mato Grosso',
+    orgao: 'Secretaria de Estado de Educação', setor: 'Gabinete do Secretário · Secretarias Adjuntas', sigla: 'SEDUC/MT',
+    loginTitulo: 'Acesso às agendas', loginTexto: 'Entre com o seu usuário e senha para ver e organizar os compromissos do gabinete.' },
+  paginas: { agenda: { nome: 'Agenda integrada', ativo: true }, meudia: { nome: 'Meu dia', ativo: true },
+    executiva: { nome: 'Agenda Executiva (PDF)', ativo: true }, relatorios: { nome: 'Relatórios e geração', ativo: true },
+    historico: { nome: 'Histórico e registros', ativo: true }, admin: { nome: 'Administração', ativo: true } },
+  documento: { titulo: 'Agenda Executiva', rodape: 'Documento Executivo', mostrarFrase: true, frases: [
+    { texto: 'Tudo posso naquele que me fortalece.', autor: 'Filipenses 4:13' },
+    { texto: 'A educação é o grande motor do desenvolvimento pessoal.', autor: 'Nelson Mandela' },
+    { texto: 'Educar a mente sem educar o coração não é educação.', autor: 'Aristóteles' },
+    { texto: 'O Senhor é o meu pastor, nada me faltará.', autor: 'Salmos 23:1' },
+    { texto: 'A educação é a própria vida.', autor: 'John Dewey' },
+    { texto: 'Feliz aquele que transfere o que sabe.', autor: 'Cora Coralina' },
+    { texto: 'Entrega o teu caminho ao Senhor; confia nele.', autor: 'Salmos 37:5' }] },
+  relatorio: { titulo: 'Agenda do Gabinete', cabecalho: 'Secretaria de Estado de Educação · Gabinete' },
+  sugestoes: {
+    tipos: ['Reunião', 'Audiência', 'Agenda externa', 'Evento', 'Videoconferência', 'Despacho interno', 'Visita', 'Viagem', 'Outro'],
+    titulos: ['Inauguração', 'Visita Técnica', 'Reunião Gerencial', 'Entrevista', 'Podcast', 'Audiência Pública'],
+    titulosRapidos: ['Agenda', 'SARC', 'SAGE', 'SAIP', 'SAEX', 'SAGP', 'SAGR', 'SAAS'],
+    locais: ['Sala de Reuniões Gabinete SEDUC', 'Gabinete Sec. Flavia', 'Gabinete Sec. Christina', 'Auditório SEDUC', 'Escola Estadual', 'Casa Civil'],
+    participantes: [{ rotulo: 'Sec. Flavia', valor: 'Sec. Flavia' }, { rotulo: 'Sec. Christina', valor: 'Sec. Christina' },
+      { rotulo: 'Sec. Adriana', valor: 'Sec. Adriana' }, { rotulo: 'Sec. Ane', valor: 'Sec. Ane' }, { rotulo: 'Sec. Matheus', valor: 'Sec. Matheus' },
+      { rotulo: 'Sec. Daniel', valor: 'Sec. Daniel' }, { rotulo: 'Sec. Geonir', valor: 'Sec. Geonir' }, { rotulo: 'Sec. Hesloan', valor: 'Sec. Hesloan' },
+      { rotulo: 'Sec. Danielle', valor: 'Sec. Danielle' }, { rotulo: 'Gov. Pivetta', valor: 'Gov. Otaviano Pivetta' }, { rotulo: 'Adjaime', valor: 'Adjaime' },
+      { rotulo: 'Sec. Gallo', valor: 'Sec. Rogério Gallo' }, { rotulo: 'Equipe', valor: 'Equipe' }]
+  },
+  equipes: [{ nome: 'Secretários Adjuntos', membros: 'Sec. Daniel, Sec. Matheus, Sec. Christina, Sec. Adriana, Sec. Ane, Sec. Hesloan' },
+            { nome: 'Gabinete', membros: 'Sec. Flavia, Equipe' }],
+  grade: { inicio: 6, fim: 23 }
+};
+let C = JSON.parse(JSON.stringify(CONFIG_PADRAO));
 const COR_ST = { 'Confirmado': '#16a34a', 'Pendente': '#d97706', 'Realizado': '#2563eb', 'Cancelado': '#dc2626' };
 const PERMS = [
   ['verTodas', 'Ver todas as agendas', 'Sem isso, vê só as agendas atribuídas'],
@@ -896,7 +953,7 @@ const PERMS = [
   ['historico', 'Ver o histórico e registros', 'Auditoria das agendas que vê'],
   ['admin', 'Administração do sistema', 'Exclusivo do perfil Administrador']
 ];
-const H0 = 6, H1 = 23, PX = 46;
+let H0 = 6, H1 = 23; const PX = 46;
 
 const ls = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }, del(k) { try { localStorage.removeItem(k); } catch (e) {} } };
 let apiUrl = ls.get('gcal_url') || URL_APPS_SCRIPT;
@@ -996,6 +1053,7 @@ async function carregarUsuariosPublicos() {
   try {
     const r = await fetch(apiUrl + (apiUrl.includes('?') ? '&' : '?') + 'action=users_public');
     const d = await r.json();
+    if (d.identidade) { C.identidade = Object.assign({}, CONFIG_PADRAO.identidade, d.identidade); aplicarIdentidade(C.identidade); }
     if (d.status !== 'success') throw new Error(d.message);
     const ult = ls.get('gcal_ultimo') || '';
     sel.innerHTML = '<option value="">Selecione o seu usuário</option>' + (d.usuarios || []).map(u =>
@@ -1080,7 +1138,7 @@ function aplicarPermissoes() {
     const ok = k === 'criar' ? agendasEditaveis(true).length > 0 : perm(k);
     el.classList.toggle('hidden', !ok);
   });
-  $('grp-gestao').classList.toggle('hidden', !['exportar', 'historico', 'admin'].some(perm));
+  $('grp-gestao').classList.toggle('hidden', !['relatorios', 'historico', 'admin'].some(t => { const n = document.querySelector(`.nav[data-tab="${t}"]`); return n && !n.classList.contains('hidden') && !n.classList.contains('desligada'); }));
 }
 
 // =================== APLICATIVO ===================
@@ -1107,7 +1165,7 @@ function aplicarDados(d) {
   S.eu = d.eu; S.pessoas = d.pessoas || []; S.dataVersion = d.dataVersion;
   $('eu-nome').textContent = S.eu.usuario; $('eu-perfil').textContent = S.eu.perfil;
   const av = $('eu-av'); av.textContent = iniciais(S.eu.usuario); av.setAttribute('style', corAv(S.eu.usuario));
-  $('dl-pessoas').innerHTML = S.pessoas.map(p => `<option value="${esc(p)}">`).join('');
+  aplicarConfig(d.config);
   if (!mdEscopo) mdEscopo = minhasAg().length ? 'minhas' : 'todas';
   aplicarPermissoes();
   atualizarBadgeHoje();
@@ -1128,7 +1186,7 @@ async function recarregar(silencioso) {
 }
 const ROT_ABA = { agenda: 'Agenda integrada', meudia: 'Meu dia', executiva: 'Agenda Executiva', relatorios: 'Relatórios', historico: 'Histórico', admin: 'Administração' };
 const PERM_ABA = { relatorios: 'exportar', historico: 'historico', admin: 'admin' };
-const abaPermitida = t => !PERM_ABA[t] || perm(PERM_ABA[t]);
+const abaPermitida = t => (!C.paginas[t] || C.paginas[t].ativo !== false) && (!PERM_ABA[t] || perm(PERM_ABA[t]));
 function irPara(t) {
   if (!abaPermitida(t)) { toast('Seu perfil não tem acesso a esta área.', 'aviso'); t = 'agenda'; }
   abaAtual = t; ls.set('gcal_aba', t);
@@ -1407,7 +1465,8 @@ function opcoesAgendas(sel, editaveis, bloquear) {
   $('ev-agendas').innerHTML = lista.map(a => `<label style="--c:${a.cor}"><input type="radio" name="ev-ag" value="${esc(a.id)}" ${a.id === sel ? 'checked' : ''} ${bloquear || !editaveis.some(x => x.id === a.id) ? 'disabled' : ''} onchange="checarConflito()"><span><i></i>${esc(a.sigla)} · ${esc(a.titular)}</span></label>`).join('');
 }
 function preencherTipos(t) {
-  const l = TIPOS.includes(t) || !t ? TIPOS : [t, ...TIPOS];
+  const T = C.sugestoes.tipos.length ? C.sugestoes.tipos : CONFIG_PADRAO.sugestoes.tipos;
+  const l = T.includes(t) || !t ? T : [t, ...T];
   $('ev-tipo').innerHTML = l.map(x => `<option ${x === t ? 'selected' : ''}>${esc(x)}</option>`).join('');
 }
 function formEvento(e, leitura) {
@@ -1434,7 +1493,7 @@ function novoEvento(data, hora) {
   $('ev-titulo-m').textContent = 'Novo compromisso'; $('ev-sub').textContent = 'O código de registro é gerado ao salvar.';
   $('ev-ico').className = 'fa-solid fa-calendar-plus';
   $('ev-excluir').classList.add('hidden'); $('ev-duplicar').classList.add('hidden'); $('ev-registro').classList.add('hidden');
-  checarConflito(); abrirModal('m-evento');
+  checarConflito(); abrirModal('m-evento'); evMinutaOferecer('');
   setTimeout(() => $('ev-titulo').focus(), 80);
 }
 function abrirEvento(id) {
@@ -1454,7 +1513,7 @@ function abrirEvento(id) {
     <div class="hm"><div class="i" style="--c:#16a34a"><i class="fa-solid fa-plus"></i></div><div>Criado por <b>${esc(e.criadoPor || '—')}</b><small>${esc(fmtQuando(e.criadoEm))}</small></div></div>
     ${e.atualizadoEm ? `<div class="hm"><div class="i" style="--c:#2563eb"><i class="fa-solid fa-pen"></i></div><div>Última alteração por <b>${esc(e.atualizadoPor)}</b><small>${esc(fmtQuando(e.atualizadoEm))}</small></div></div>` : ''}
     <div id="ev-hist" style="font-size:12px;color:var(--mut)"><i class="fa-solid fa-spinner fa-spin"></i> Carregando histórico...</div>`;
-  checarConflito(); abrirModal('m-evento'); pingAgora();
+  checarConflito(); abrirModal('m-evento'); evMinutaOferecer(id); pingAgora();
   api('historico', { eventoId: id, limite: 50 }).then(d => {
     if (eventoAberto !== id) return;
     const l = (d.itens || []).filter(h => h.acao !== 'Criado' || true);
@@ -1510,6 +1569,7 @@ async function salvarEvento() {
   const b = $('ev-salvar'); b.disabled = true; b.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>Salvando...';
   try {
     const r = await api('evento_save', { evento: ev });
+    evMinutaLimpar();
     if (r.semMudanca) { toast('Nada foi alterado.', 'aviso'); fecharModal('m-evento'); return; }
     const i = S.eventos.findIndex(x => x.id === r.evento.id);
     if (i >= 0) S.eventos[i] = r.evento; else S.eventos.push(r.evento);
@@ -1548,6 +1608,7 @@ function duplicarEvento() {
   eventoAberto = '';
   formEvento(Object.assign({}, e, { id: '', status: e.status === 'Cancelado' || e.status === 'Realizado' ? 'Confirmado' : e.status }), false);
   opcoesAgendas(eds.some(a => a.id === e.agendaId) ? e.agendaId : eds[0].id, eds, false);
+  $('ev-minuta').classList.add('hidden'); $('ev-minuta-st').innerHTML = '';
   $('ev-titulo-m').textContent = 'Duplicar compromisso'; $('ev-sub').textContent = `Cópia de ${e.codigo}. Ajuste a data e salve: um novo código será gerado.`;
   $('ev-ico').className = 'fa-regular fa-copy';
   $('ev-excluir').classList.add('hidden'); $('ev-duplicar').classList.add('hidden'); $('ev-registro').classList.add('hidden');
@@ -1595,7 +1656,7 @@ function renderMeuDia() {
 // =================== HISTÓRICO ===================
 const ACOES = {
   'Criado': ['fa-plus', '#16a34a'], 'Alterado': ['fa-pen', '#2563eb'], 'Excluído': ['fa-trash-can', '#dc2626'], 'Relatório': ['fa-file-lines', '#7c3aed'],
-  'Acesso': ['fa-right-to-bracket', '#64748b'], 'Usuário': ['fa-user-gear', '#e11d48'], 'Agendas': ['fa-palette', '#0891b2'], 'Camadas': ['fa-layer-group', '#d97706'], _: ['fa-circle-info', '#64748b']
+  'Acesso': ['fa-right-to-bracket', '#64748b'], 'Usuário': ['fa-user-gear', '#e11d48'], 'Agendas': ['fa-palette', '#0891b2'], 'Camadas': ['fa-layer-group', '#d97706'], 'Configurações': ['fa-sliders', '#0f766e'], _: ['fa-circle-info', '#64748b']
 };
 let hPer = '30', histItens = [];
 function hPeriodo(p) { hPer = p; carregarHistorico(); }
@@ -1676,7 +1737,7 @@ function codigoGeracao() {
 }
 function registrarGeracao(codigo, formato, l) {
   const ags = [...new Set(l.map(e => (agDe(e.agendaId) || {}).sigla))].join(', ');
-  api('registrar_geracao', { codigo, detalhe: `${formato} · ${$('rel-titulo').value.trim() || 'Agenda do Gabinete'} · ${fmtData($('rel-de').value)} a ${fmtData($('rel-ate').value)} · ${l.length} compromisso(s) · ${ags || '—'}` }).catch(() => {});
+  api('registrar_geracao', { codigo, detalhe: `${formato} · ${$('rel-titulo').value.trim() || C.relatorio.titulo} · ${fmtData($('rel-de').value)} a ${fmtData($('rel-ate').value)} · ${l.length} compromisso(s) · ${ags || '—'}` }).catch(() => {});
 }
 function exportarCSV() {
   const l = relLista();
@@ -1693,7 +1754,7 @@ function exportarCSV() {
 function imprimirRelatorio() {
   const l = relLista();
   if (!l.length) return toast('Não há compromissos para gerar o documento.', 'aviso');
-  const cod = codigoGeracao(), tit = $('rel-titulo').value.trim() || 'Agenda do Gabinete', agora = new Date();
+  const cod = codigoGeracao(), tit = $('rel-titulo').value.trim() || C.relatorio.titulo, agora = new Date();
   let corpo = '', dia = '';
   l.forEach(e => {
     if (e.data !== dia) { if (dia) corpo += '</tbody></table>'; dia = e.data; corpo += `<h2>${esc(cap(fmtData(dia, { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })))}</h2><table><thead><tr><th style="width:92px">Horário</th><th style="width:70px">Agenda</th><th>Compromisso</th><th style="width:22%">Local / participantes</th><th style="width:84px">Situação</th></tr></thead><tbody>`; }
@@ -1715,10 +1776,10 @@ function imprimirRelatorio() {
     .ds{color:#334155;margin-top:3px;white-space:pre-wrap}.cd{font-family:Consolas,monospace;color:#94a3b8;font-size:9px;margin-top:3px}
     .rod{margin-top:16px;border-top:1px solid #cbd5e1;padding-top:6px;color:#64748b;font-size:9.5px;display:flex;justify-content:space-between}
   </style></head><body>
-    <div class="cab"><div><small>Governo de Mato Grosso</small><b>Secretaria de Estado de Educação · Gabinete</b></div><div style="text-align:right;font-family:Consolas,monospace;font-size:10px">${esc(cod)}</div></div>
+    <div class="cab"><div><small>${esc(C.identidade.governo)}</small><b>${esc(C.relatorio.cabecalho)}</b></div><div style="text-align:right;font-family:Consolas,monospace;font-size:10px">${esc(cod)}</div></div>
     <h1>${esc(tit)}</h1><div class="sub">Período: ${esc(fmtData($('rel-de').value))} a ${esc(fmtData($('rel-ate').value))} · ${l.length} compromisso(s)</div>
     ${corpo}
-    <div class="rod"><span>Gerado por ${esc(S.eu.usuario)} em ${agora.toLocaleDateString('pt-BR')} às ${agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })} · GABAgenda</span><span>Código de geração: ${esc(cod)}</span></div>
+    <div class="rod"><span>Gerado por ${esc(S.eu.usuario)} em ${agora.toLocaleDateString('pt-BR')} às ${agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })} · ${esc(nomeSistema())}</span><span>Código de geração: ${esc(cod)}</span></div>
   </body></html>`;
   const fr = document.createElement('iframe');
   fr.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0';
@@ -1738,6 +1799,7 @@ async function admIr(s) {
   if (s === 'usuarios') { $('adm-conteudo').innerHTML = '<div class="vazio"><i class="fa-solid fa-spinner fa-spin"></i>Carregando usuários...</div>'; await carregarUsuariosAdm(); renderAdmUsuarios(); }
   else if (s === 'online') { renderAdmOnline(); pingAgora(); }
   else if (s === 'agendas') { agEdit = JSON.parse(JSON.stringify(S.agendas)); renderAdmAgendas(); }
+  else if (s === 'config') { cfgEdit = JSON.parse(JSON.stringify(C)); renderAdmConfig(); }
   else if (s === 'camadas') { pfEdit = JSON.parse(JSON.stringify(S.perfis)); if (!S.usuarios.length) await carregarUsuariosAdm(); renderAdmCamadas(); }
 }
 async function carregarUsuariosAdm() {
@@ -1893,22 +1955,8 @@ async function pfSalvar(b) {
 }
 
 // =================== AGENDA EXECUTIVA (DOCUMENTO A4 / PDF) ===================
-const EX_FRASES = [
-  { text: 'Tudo posso naquele que me fortalece.', author: 'Filipenses 4:13' },
-  { text: 'A educação é o grande motor do desenvolvimento pessoal.', author: 'Nelson Mandela' },
-  { text: 'Educar a mente sem educar o coração não é educação.', author: 'Aristóteles' },
-  { text: 'O Senhor é o meu pastor, nada me faltará.', author: 'Salmos 23:1' },
-  { text: 'A educação é a própria vida.', author: 'John Dewey' },
-  { text: 'Feliz aquele que transfere o que sabe.', author: 'Cora Coralina' },
-  { text: 'Entrega o teu caminho ao Senhor; confia nele.', author: 'Salmos 37:5' }
-];
-const EX_TITULOS = ['Inauguração', 'Visita Técnica', 'Reunião Gerencial', 'Entrevista', 'Podcast', 'Audiência Pública'];
-const EX_RAP_TITULOS = ['Agenda', 'SARC', 'SAGE', 'SAIP', 'SAEX', 'SAGP', 'SAGR', 'SAAS'];
-const EX_LOCAIS = ['Sala de Reuniões Gabinete SEDUC', 'Gabinete Sec. Flavia', 'Gabinete Sec. Christina', 'Auditório SEDUC', 'Escola Estadual', 'Casa Civil'];
-const EX_PART = [['Sec. Flavia'], ['Sec. Christina'], ['Sec. Adriana'], ['Sec. Ane'], ['Sec. Matheus'], ['Sec. Geonir'], ['Sec. Hesloan'], ['Sec. Danielle'],
-  ['Gov. Pivetta', 'Gov. Otaviano Pivetta'], ['Adjaime'], ['Sec. Gallo', 'Sec. Rogério Gallo'], ['Equipe']];
 const HTML2PDF_URL = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
-let exFrase = EX_FRASES[Math.floor(Math.random() * EX_FRASES.length)], exEditId = '';
+let exFrase = null, exEditId = '';
 
 const hexRgb = h => { const n = parseInt(String(h).slice(1), 16) || 0; return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
 function misturar(h, alvo, t) { const a = hexRgb(h), b = hexRgb(alvo); return '#' + a.map((v, i) => Math.round(v + (b[i] - v) * t).toString(16).padStart(2, '0')).join(''); }
@@ -1931,12 +1979,13 @@ function exAtualizarFim() {
 function exDuracao(min, btn) {
   const ini = $('ex-ini').value;
   if (!ini) { $('ex-ini').focus(); return toast('Informe primeiro o horário de início.', 'aviso'); }
-  $('ex-fim').value = somarHora(ini, min);
+  $('ex-fim').value = somarHora(ini, min); exMinutaAgendar();
   if (btn) { btn.classList.add('pulso'); setTimeout(() => btn.classList.remove('pulso'), 160); }
 }
 function exRapido(campo, valor, sep, btn) {
   const i = $(campo); i.value = i.value.trim() ? i.value.trim() + sep + valor : valor;
   if (btn) { btn.classList.add('pulso'); setTimeout(() => btn.classList.remove('pulso'), 160); }
+  exMinutaAgendar();
 }
 function exPreparar() {
   const ags = agendasVisiveis().filter(a => a.ativo), sel = $('ex-ag'), atual = sel.value;
@@ -1944,19 +1993,18 @@ function exPreparar() {
   sel.innerHTML = ags.map(a => `<option value="${esc(a.id)}">${esc(a.sigla)} · ${esc(a.titular)}</option>`).join('');
   sel.value = padrao;
   if (!$('ex-data').value) $('ex-data').value = V.dia || hojeISO();
-  const locais = [...new Set([...EX_LOCAIS, ...S.eventos.map(e => e.local).filter(Boolean)])].slice(0, 80);
-  $('ex-dl-locais').innerHTML = locais.map(l => `<option value="${esc(l)}">`).join('');
-  $('ex-dl-titulos').innerHTML = [...new Set([...EX_TITULOS, ...S.eventos.map(e => e.titulo)])].slice(0, 80).map(t => `<option value="${esc(t)}">`).join('');
-  const rapT = [...new Set([...EX_RAP_TITULOS, ...S.agendas.filter(a => a.ativo && a.sigla.length > 3).map(a => a.sigla.replace(/^G/, ''))])];
-  $('ex-rap-titulos').innerHTML = rapT.map(t => `<button type="button" onclick="exRapido('ex-titulo',${jsA(t)},' - ',this)">${esc(t)}</button>`).join('');
-  const nomes = EX_PART.map(p => p[0]), part = [...EX_PART];
-  S.agendas.filter(a => a.ativo).forEach(a => { const n = 'Sec. ' + (a.titular.split(' ')[0] || ''); if (a.titular && !nomes.includes(n)) { nomes.push(n); part.splice(part.length - 4, 0, [n]); } });
-  $('ex-rap-part').innerHTML = part.map(([r, v]) => `<button type="button" onclick="exRapido('ex-part',${jsA(v || r)},', ',this)">${esc(r)}</button>`).join('');
+  $('ex-rap-titulos').innerHTML = C.sugestoes.titulosRapidos.map(t => `<button type="button" onclick="exRapido('ex-titulo',${jsA(t)},' - ',this)">${esc(t)}</button>`).join('');
+  $('ex-rap-titulos').classList.toggle('hidden', !C.sugestoes.titulosRapidos.length);
+  $('ex-rap-part').innerHTML = C.sugestoes.participantes.map(p => `<button type="button" title="${esc(p.valor)}" onclick="exRapido('ex-part',${jsA(p.valor)},', ',this)">${esc(p.rotulo)}</button>`).join('');
+  $('ex-rap-part').classList.toggle('hidden', !C.sugestoes.participantes.length);
+  $('ex-rap-equipes').innerHTML = C.equipes.length ? '<span style="font-size:11px;font-weight:700;color:var(--mut)">Equipes:</span>' + C.equipes.map((q, i) => `<button type="button" title="${esc(q.membros)}" onclick="addEquipe('ex-part',${i},this)"><i class="fa-solid fa-people-group"></i> ${esc(q.nome)}</button>`).join('') : '';
+  $('ex-rap-equipes').classList.toggle('hidden', !C.equipes.length);
+  exMinutaRestaurar();
   exRender();
 }
-function exTrocouAgenda() { $('ex-nome').value = ''; exResetForm(); exRender(); }
-function exIrDia(n) { $('ex-data').value = n === 0 ? hojeISO() : addDias(exData(), n); exResetForm(); exRender(); }
-function exNovaFrase() { let f; do { f = EX_FRASES[Math.floor(Math.random() * EX_FRASES.length)]; } while (EX_FRASES.length > 1 && f === exFrase); exFrase = f; exRender(); }
+function exTrocouAgenda() { $('ex-nome').value = ''; if (exEditId) exResetForm(); exRender(); exMinutaAgendar(); }
+function exIrDia(n) { $('ex-data').value = n === 0 ? hojeISO() : addDias(exData(), n); if (exEditId) exResetForm(); exRender(); exMinutaAgendar(); }
+function exNovaFrase() { const F = C.documento.frases; if (!F.length) return toast('Cadastre frases em Administração › Configurações.', 'aviso'); let f; do { f = F[Math.floor(Math.random() * F.length)]; } while (F.length > 1 && f === exFrase); exFrase = f; exRender(); }
 function exDensidade(n) { return n <= 5 ? ['l-comfortable', 'Confortável'] : n <= 7 ? ['l-standard', 'Padrão'] : n <= 10 ? ['l-compact', 'Compacta'] : n <= 12 ? ['l-super', 'Supercompacta'] : ['l-extreme', 'Máxima']; }
 
 function exItemHTML(e, i, acoes) {
@@ -1995,11 +2043,11 @@ function exPaginaHTML(o = {}) {
       <div class="ex-head-ics"><i class="fa-solid fa-book-open-reader"></i><i class="fa-solid fa-lightbulb"></i><i class="fa-solid fa-microscope"></i><i class="fa-solid fa-atom"></i><i class="fa-solid fa-palette"></i></div>
       <i class="fa-solid fa-graduation-cap ex-head-cap"></i>
       <div class="ex-head-in"><div class="ex-nome">${esc(exNomeCab(a))}</div><div class="ex-sep"></div>
-        <div class="ex-linha"><h1 class="ex-titulo"><i class="fa-solid fa-bookmark"></i> Agenda Executiva</h1><div class="ex-data"><i class="fa-regular fa-calendar"></i><span>${esc(exDataLonga(exData()))}</span></div></div></div>
-      <div class="ex-frase"><p class="q">"${esc(exFrase.text)}"</p><p class="a">- ${esc(exFrase.author)}</p></div>
+        <div class="ex-linha"><h1 class="ex-titulo"><i class="fa-solid fa-bookmark"></i> ${esc(C.documento.titulo)}</h1><div class="ex-data"><i class="fa-regular fa-calendar"></i><span>${esc(exDataLonga(exData()))}</span></div></div></div>
+      ${C.documento.mostrarFrase && exFrase ? `<div class="ex-frase"><p class="q">"${esc(exFrase.texto)}"</p>${exFrase.autor ? `<p class="a">- ${esc(exFrase.autor)}</p>` : ''}</div>` : ''}
     </header>
     <div class="ex-conteudo"><div class="ex-escala-in"><div class="ex-lista ${dens}">${itens || '<div class="ex-vazio"><i class="fa-regular fa-calendar"></i>Nenhum compromisso nesta data</div>'}</div></div>
-      <footer class="ex-rodape"><span>Documento Executivo</span>${o.codigo ? `<span>·</span><span>${esc(o.codigo)}</span>` : ''}</footer></div></div>`;
+      <footer class="ex-rodape"><span>${esc(C.documento.rodape)}</span>${o.codigo ? `<span>·</span><span>${esc(o.codigo)}</span>` : ''}</footer></div></div>`;
 }
 /** Encolhe a lista para caber sempre em uma única folha (igual ao documento original). */
 function exCaber(pagina) {
@@ -2043,6 +2091,7 @@ function exResetForm() {
   $('ex-add-txt').textContent = 'Adicionar à agenda'; $('ex-add-ic').className = 'fa-solid fa-plus';
   $('ex-cancelar').classList.add('hidden');
   document.querySelectorAll('.ex-item.editando').forEach(x => x.classList.remove('editando'));
+  exMinutaLimpar();
 }
 function exEditar(id) {
   const e = S.eventos.find(x => x.id === id);
@@ -2057,6 +2106,7 @@ function exEditar(id) {
   $('ex-cancelar').classList.remove('hidden');
   document.querySelectorAll('.ex-item').forEach(x => x.classList.toggle('editando', x.dataset.id === id));
   if (innerWidth < 1180) $('ex-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  exMinutaAgendar();
   $('ex-titulo').focus();
 }
 async function exSalvar() {
@@ -2232,6 +2282,212 @@ function exImprimir() {
   if (d.readyState === 'complete') pronto(); else fr.onload = pronto;
 }
 
+// =================== CONFIGURAÇÕES (Administração › Configurações) ===================
+function mesclarConfig(c) {
+  const base = JSON.parse(JSON.stringify(CONFIG_PADRAO));
+  if (!c || typeof c !== 'object') return base;
+  Object.keys(base).forEach(k => {
+    if (c[k] === undefined) return;
+    if (Array.isArray(base[k]) || typeof base[k] !== 'object') base[k] = c[k];
+    else Object.keys(c[k] || {}).forEach(j => { base[k][j] = (base[k][j] && typeof base[k][j] === 'object' && !Array.isArray(base[k][j])) ? Object.assign({}, base[k][j], c[k][j]) : c[k][j]; });
+  });
+  return base;
+}
+/** Troca o texto de um botão/título sem apagar o ícone que está junto. */
+function setTexto(el, txt) {
+  if (!el) return;
+  const n = [...el.childNodes].reverse().find(x => x.nodeType === 3 && x.nodeValue.trim());
+  if (n) n.nodeValue = txt; else el.appendChild(document.createTextNode(txt));
+}
+const nomeSistema = () => (C.identidade.nomeA || '') + (C.identidade.nomeB || '');
+function aplicarIdentidade(i) {
+  i = Object.assign({}, CONFIG_PADRAO.identidade, i || {});
+  const marca = `${esc(i.nomeA)}<span>${esc(i.nomeB)}</span>`;
+  ['id-logo', 'id-sb-nome', 'id-topo-nome'].forEach(id => { if ($(id)) $(id).innerHTML = marca; });
+  $('id-carr').innerHTML = `${esc(String(i.nomeA).toUpperCase())}<span style="color:var(--azul)">${esc(String(i.nomeB).toUpperCase())}</span>`;
+  $('id-sub').textContent = i.subtitulo;
+  $('id-inst').innerHTML = `<b>${esc(i.governo)}</b><span>${esc(i.orgao)}</span><small>${esc(i.setor)}</small>`;
+  $('id-login-tit').textContent = i.loginTitulo; $('id-login-txt').textContent = i.loginTexto;
+  $('id-rodape').textContent = `${i.sigla} · ${i.nomeA}${i.nomeB}`;
+  document.title = `${i.nomeA}${i.nomeB} · ${i.subtitulo}`;
+  ls.set('gcal_ident', JSON.stringify(i));
+}
+function aplicarConfig(c) {
+  if (c) C = mesclarConfig(c);
+  aplicarIdentidade(C.identidade);
+  Object.entries(C.paginas).forEach(([k, p]) => {
+    const nav = document.querySelector(`.nav[data-tab="${k}"]`);
+    if (nav) { setTexto(nav, p.nome); nav.title = p.nome; nav.classList.toggle('desligada', p.ativo === false); }
+    setTexto(document.querySelector(`#tab-${k} .cab h2`), p.nome.replace(/\s*\(.*\)\s*$/, ''));
+  });
+  H0 = Math.max(0, Math.min(22, +C.grade.inicio || 0)); H1 = Math.max(H0 + 1, Math.min(24, +C.grade.fim || 24));
+  $('rel-titulo').placeholder = C.relatorio.titulo;
+  if (C.documento.frases.length && !C.documento.frases.some(f => exFrase && f.texto === exFrase.texto)) exFrase = C.documento.frases[Math.floor(Math.random() * C.documento.frases.length)];
+  atualizarListas();
+  if (S.eu) aplicarPermissoes();
+  if (S.eu && !abaPermitida(abaAtual)) irPara('agenda');
+}
+/** Sugestões de digitação (títulos, locais e participantes) e botões de equipes no formulário completo. */
+function atualizarListas() {
+  const uniq = l => [...new Set(l.filter(Boolean))];
+  $('dl-pessoas').innerHTML = uniq([...C.sugestoes.participantes.map(p => p.valor), ...(S.pessoas || [])]).map(p => `<option value="${esc(p)}">`).join('');
+  $('dl-locais').innerHTML = uniq([...C.sugestoes.locais, ...S.eventos.map(e => e.local)]).slice(0, 120).map(l => `<option value="${esc(l)}">`).join('');
+  $('dl-titulos').innerHTML = uniq([...C.sugestoes.titulos, ...S.eventos.map(e => e.titulo)]).slice(0, 120).map(t => `<option value="${esc(t)}">`).join('');
+  const eq = $('ev-equipes');
+  eq.innerHTML = C.equipes.length ? '<span style="font-size:11px;font-weight:700;color:var(--mut)">Equipes:</span>' + C.equipes.map((q, i) => `<button type="button" title="${esc(q.membros)}" onclick="addEquipe('ev-participantes',${i},this)"><i class="fa-solid fa-people-group"></i> ${esc(q.nome)}</button>`).join('') : '';
+  eq.classList.toggle('hidden', !C.equipes.length);
+}
+function addEquipe(campo, i, btn) {
+  const q = C.equipes[i]; if (!q) return;
+  const inp = $(campo), atuais = inp.value.split(',').map(s => s.trim()).filter(Boolean), chaves = atuais.map(normTxt);
+  q.membros.split(',').map(s => s.trim()).filter(Boolean).forEach(m => { if (!chaves.includes(normTxt(m))) { atuais.push(m); chaves.push(normTxt(m)); } });
+  inp.value = atuais.join(', ');
+  if (btn) { btn.classList.add('pulso'); setTimeout(() => btn.classList.remove('pulso'), 160); }
+  inp.dispatchEvent(new Event('input', { bubbles: true }));
+}
+
+let cfgEdit = null;
+const PAG_ICO = { agenda: 'fa-calendar-days', meudia: 'fa-sun', executiva: 'fa-file-pdf', relatorios: 'fa-file-lines', historico: 'fa-clock-rotate-left', admin: 'fa-user-shield' };
+function cfgGet(path) { return path.split('.').reduce((o, k) => o == null ? o : o[k], cfgEdit); }
+function cfgSet(path, v) { const ks = path.split('.'), u = ks.pop(); ks.reduce((o, k) => o[k], cfgEdit)[u] = v; cfgSujo(); }
+function cfgSujo() { const b = $('cfg-salvar'); if (b) b.classList.add('pulsar'); const s = $('cfg-st'); if (s) s.textContent = 'Alterações não salvas'; }
+const linhas = t => String(t || '').split('\n').map(s => s.trim()).filter(Boolean);
+function cfgCampo(rot, path, o = {}) {
+  const v = cfgGet(path) ?? '';
+  return `<label class="campo ${o.full ? 'cfg-full' : ''}"><span>${rot}</span>${o.area
+    ? `<textarea class="inp" rows="${o.rows || 3}" oninput="cfgSet('${path}', this.value)">${esc(v)}</textarea>`
+    : `<input class="inp" ${o.tipo ? `type="${o.tipo}"` : ''} ${o.min !== undefined ? `min="${o.min}" max="${o.max}"` : ''} value="${esc(v)}" maxlength="${o.max || 240}" oninput="cfgSet('${path}', ${o.tipo === 'number' ? '+this.value' : 'this.value'})">`}</label>`;
+}
+function cfgLista(rot, path, dica, rows) {
+  return `<label class="campo cfg-full"><span>${rot} <small style="font-weight:500;color:var(--mut2)">· ${dica}</small></span><textarea class="inp" rows="${rows || 5}" oninput="cfgSet('${path}', linhas(this.value))">${esc((cfgGet(path) || []).join('\n'))}</textarea></label>`;
+}
+function renderAdmConfig() {
+  const c = cfgEdit, P = c.paginas;
+  const card = (ic, cor, tit, sub, corpo) => `<div class="card pad cfg-card" style="--c:${cor}"><div class="cfg-cab"><span class="ic"><i class="fa-solid ${ic}"></i></span><div><h4>${tit}</h4><p>${sub}</p></div></div><div class="cfg-corpo">${corpo}</div></div>`;
+  $('adm-conteudo').innerHTML = `<div class="adm-cab" style="margin:0"><div><h3>Configurações do sistema</h3><p>Nomes, páginas, documento executivo, sugestões de texto e equipes. Ao salvar, a mudança vale para todos os usuários em poucos segundos.</p></div></div>
+  <div class="cfg-grade">
+    ${card('fa-id-card', '#2563eb', 'Identidade', 'Nome do sistema e textos da tela de entrada',
+      `${cfgCampo('Nome (parte 1)', 'identidade.nomeA', { max: 40 })}${cfgCampo('Nome (parte 2, em destaque)', 'identidade.nomeB', { max: 40 })}
+       ${cfgCampo('Subtítulo', 'identidade.subtitulo', { full: 1, max: 80 })}${cfgCampo('Governo', 'identidade.governo', { max: 80 })}${cfgCampo('Órgão', 'identidade.orgao', { max: 80 })}
+       ${cfgCampo('Setor', 'identidade.setor', { full: 1, max: 80 })}${cfgCampo('Sigla (rodapé)', 'identidade.sigla', { max: 80 })}${cfgCampo('Título da tela de entrada', 'identidade.loginTitulo', { max: 80 })}
+       ${cfgCampo('Texto da tela de entrada', 'identidade.loginTexto', { full: 1, area: 1, rows: 2, max: 240 })}`)}
+    ${card('fa-table-columns', '#0f766e', 'Páginas do menu', 'Renomeie ou desligue páginas (Agenda e Administração ficam sempre ligadas)',
+      Object.keys(P).map(k => `<div class="cfg-pag cfg-full"><i class="fa-solid ${PAG_ICO[k] || 'fa-file'}"></i><input class="inp" value="${esc(P[k].nome)}" maxlength="40" oninput="cfgSet('paginas.${k}.nome', this.value)">
+        <button type="button" class="sw ${P[k].ativo !== false ? 'on' : ''}" ${['agenda', 'admin'].includes(k) ? 'disabled title="Sempre ligada"' : ''} onclick="cfgSet('paginas.${k}.ativo', !(cfgGet('paginas.${k}.ativo') !== false)); this.classList.toggle('on')"><span></span></button></div>`).join(''))}
+    ${card('fa-file-pdf', '#be185d', 'Documento executivo (PDF)', 'Textos da folha A4 da Agenda Executiva',
+      `${cfgCampo('Título no cabeçalho', 'documento.titulo', { max: 60 })}${cfgCampo('Texto do rodapé', 'documento.rodape', { max: 60 })}
+       <div class="campo cfg-full" style="flex-direction:row;align-items:center;gap:10px"><button type="button" class="sw ${c.documento.mostrarFrase ? 'on' : ''}" onclick="cfgSet('documento.mostrarFrase', !cfgGet('documento.mostrarFrase')); this.classList.toggle('on')"><span></span></button><span style="font-size:12.5px;font-weight:600;color:var(--tx2)">Mostrar a frase do dia no cabeçalho</span></div>
+       <label class="campo cfg-full"><span>Frases do dia <small style="font-weight:500;color:var(--mut2)">· uma por linha, no formato: frase | autor</small></span><textarea class="inp" rows="6" oninput="cfgSet('documento.frases', linhas(this.value).map(l => { const [t, ...a] = l.split('|'); return { texto: t.trim(), autor: a.join('|').trim() }; }))">${esc(c.documento.frases.map(f => f.texto + (f.autor ? ' | ' + f.autor : '')).join('\n'))}</textarea></label>`)}
+    ${card('fa-lightbulb', '#d97706', 'Sugestões de texto para a agenda', 'Listas que aparecem ao preencher os compromissos',
+      `${cfgLista('Tipos de compromisso', 'sugestoes.tipos', 'um por linha', 4)}${cfgLista('Títulos sugeridos', 'sugestoes.titulos', 'um por linha (aparecem ao digitar)', 4)}
+       ${cfgLista('Botões rápidos de título', 'sugestoes.titulosRapidos', 'um por linha', 3)}${cfgLista('Locais sugeridos', 'sugestoes.locais', 'um por linha', 5)}
+       <label class="campo cfg-full"><span>Botões rápidos de participantes <small style="font-weight:500;color:var(--mut2)">· um por linha; para um texto diferente no botão use: Botão = Nome completo</small></span><textarea class="inp" rows="6" oninput="cfgSet('sugestoes.participantes', linhas(this.value).map(l => { const [r, ...v] = l.split('='); const val = v.join('=').trim(); return { rotulo: r.trim(), valor: val || r.trim() }; }))">${esc(c.sugestoes.participantes.map(p => p.rotulo === p.valor ? p.rotulo : `${p.rotulo} = ${p.valor}`).join('\n'))}</textarea></label>`)}
+    ${card('fa-people-group', '#7c3aed', 'Equipes', 'Um clique adiciona todos os membros como participantes',
+      `<div class="cfg-full" id="cfg-equipes">${c.equipes.map((q, i) => `<div class="cfg-eq"><input class="inp" value="${esc(q.nome)}" maxlength="50" placeholder="Nome da equipe" oninput="cfgEdit.equipes[${i}].nome=this.value;cfgSujo()">
+          <input class="inp" value="${esc(q.membros)}" maxlength="800" placeholder="Membros separados por vírgula" oninput="cfgEdit.equipes[${i}].membros=this.value;cfgSujo()">
+          <button type="button" class="btn-ic" title="Remover equipe" onclick="cfgEdit.equipes.splice(${i},1);cfgSujo();renderAdmConfig()"><i class="fa-solid fa-trash-can"></i></button></div>`).join('') || '<p style="margin:0;font-size:12.5px;color:var(--mut)">Nenhuma equipe cadastrada.</p>'}
+        <button type="button" class="btn btn-s" style="margin-top:8px" onclick="cfgEdit.equipes.push({ nome: '', membros: '' });cfgSujo();renderAdmConfig()"><i class="fa-solid fa-plus"></i>Nova equipe</button></div>`)}
+    ${card('fa-file-lines', '#475569', 'Relatórios e calendário', 'Cabeçalho dos relatórios e horário da grade semanal',
+      `${cfgCampo('Título padrão do relatório', 'relatorio.titulo', { max: 100 })}${cfgCampo('Cabeçalho do relatório', 'relatorio.cabecalho', { max: 100 })}
+       ${cfgCampo('Grade começa às (hora)', 'grade.inicio', { tipo: 'number', min: 0, max: 22 })}${cfgCampo('Grade termina às (hora)', 'grade.fim', { tipo: 'number', min: 1, max: 24 })}`)}
+  </div>
+  <div class="card pad barra-salvar cfg-barra"><span id="cfg-st" style="margin-right:auto;font-size:12.5px;color:var(--mut)"></span>
+    <button class="btn btn-perigo" onclick="cfgRestaurar()"><i class="fa-solid fa-rotate-left"></i>Restaurar padrão</button>
+    <button class="btn btn-s" onclick="admIr('config')">Descartar</button>
+    <button class="btn btn-p" id="cfg-salvar" onclick="cfgSalvar(this)"><i class="fa-solid fa-floppy-disk"></i>Salvar configurações</button></div>`;
+}
+async function cfgSalvar(b) {
+  b.disabled = true;
+  try {
+    const r = await api('config_save', { config: cfgEdit });
+    S.dataVersion = r.dataVersion; aplicarConfig(r.config); cfgEdit = JSON.parse(JSON.stringify(C));
+    renderAdmConfig(); toast('Configurações salvas para todos os usuários.');
+  } catch (e) { toast(e.message, 'erro'); }
+  finally { if (document.body.contains(b)) b.disabled = false; }
+}
+async function cfgRestaurar() {
+  if (!confirm('Voltar todas as configurações (nomes, páginas, sugestões, equipes e frases) para o padrão de instalação?')) return;
+  try { const r = await api('config_save', { restaurar: true }); S.dataVersion = r.dataVersion; aplicarConfig(r.config); cfgEdit = JSON.parse(JSON.stringify(C)); renderAdmConfig(); toast('Configurações padrão restauradas.'); }
+  catch (e) { toast(e.message, 'erro'); }
+}
+
+// =================== MINUTAS (salvamento automático do que está sendo preenchido) ===================
+const minKey = t => `gcal_minuta_${t}_${normTxt(S.eu ? S.eu.usuario : '').replace(/\s+/g, '_')}`;
+const minLer = t => { try { return JSON.parse(ls.get(minKey(t)) || 'null'); } catch (e) { return null; } };
+const minHora = ms => new Date(ms).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+const minData = ms => { const d = new Date(ms); return (iso(d) === hojeISO() ? 'hoje' : d.toLocaleDateString('pt-BR')) + ' às ' + minHora(ms); };
+function lerCampos(ids) { const o = {}; ids.forEach(id => { const el = $(id); o[id] = el.type === 'checkbox' ? el.checked : el.value; }); return o; }
+function porCampos(o) { Object.entries(o || {}).forEach(([id, v]) => { const el = $(id); if (!el) return; if (el.type === 'checkbox') el.checked = !!v; else el.value = v; }); }
+// -- Agenda Executiva
+const EX_MIN = ['ex-nome', 'ex-tipo', 'ex-prio', 'ex-ini', 'ex-fim', 'ex-titulo', 'ex-local', 'ex-part', 'ex-pautas'];
+let exMinT = null, exMinVerificada = false;
+function exMinutaAgendar() { clearTimeout(exMinT); exMinT = setTimeout(exMinutaSalvar, 350); }
+function exMinutaSalvar() {
+  if (!S.eu) return;
+  const c = lerCampos(EX_MIN), tem = exEditId || ['ex-titulo', 'ex-local', 'ex-part', 'ex-pautas'].some(k => c[k].trim());
+  if (!tem) { ls.del(minKey('ex')); exMinutaStatus(null); return; }
+  const m = { ag: $('ex-ag').value, data: exData(), editId: exEditId, campos: c, em: Date.now() };
+  ls.set(minKey('ex'), JSON.stringify(m)); exMinutaStatus(m);
+}
+function exMinutaStatus(m) {
+  const s = $('ex-minuta');
+  if (!m) { s.classList.add('hidden'); return; }
+  s.classList.remove('hidden');
+  s.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i>Minuta salva automaticamente às ${minHora(m.em)} <button type="button" onclick="exMinutaDescartar()">Descartar</button>`;
+}
+function exMinutaLimpar() { clearTimeout(exMinT); if (S.eu) ls.del(minKey('ex')); exMinutaStatus(null); }
+function exMinutaDescartar() { exResetForm(); toast('Minuta descartada.'); }
+function exMinutaRestaurar() {
+  if (exMinVerificada) return; exMinVerificada = true;
+  const m = minLer('ex'); if (!m) return;
+  if ([...$('ex-ag').options].some(o => o.value === m.ag)) $('ex-ag').value = m.ag;
+  if (m.data) $('ex-data').value = m.data;
+  porCampos(m.campos);
+  if (m.editId && S.eventos.some(e => e.id === m.editId)) {
+    exEditId = m.editId; $('ex-add-txt').textContent = 'Salvar alterações'; $('ex-add-ic').className = 'fa-solid fa-floppy-disk'; $('ex-cancelar').classList.remove('hidden');
+  }
+  exMinutaStatus(m);
+  toast(`Minuta recuperada (salva ${minData(m.em)}).`, 'aviso');
+}
+// -- Formulário completo de compromisso
+const EV_MIN = ['ev-titulo', 'ev-tipo', 'ev-status', 'ev-modalidade', 'ev-prioridade', 'ev-data', 'ev-inicio', 'ev-fim', 'ev-dia-inteiro', 'ev-local', 'ev-link', 'ev-participantes', 'ev-descricao'];
+let evMinT = null;
+function evMinutaAgendar() { if (!$('ev-leitura').classList.contains('hidden')) return; clearTimeout(evMinT); evMinT = setTimeout(evMinutaSalvar, 350); }
+function evMinutaSalvar() {
+  if (!S.eu || !$('m-evento').classList.contains('aberto')) return;
+  const c = lerCampos(EV_MIN);
+  if (!['ev-titulo', 'ev-local', 'ev-participantes', 'ev-descricao'].some(k => String(c[k]).trim())) return;
+  const m = { id: $('ev-id').value, ag: agSel(), campos: c, em: Date.now() };
+  ls.set(minKey('ev'), JSON.stringify(m));
+  $('ev-minuta-st').innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i>Minuta salva às ${minHora(m.em)}`;
+}
+function evMinutaLimpar() { clearTimeout(evMinT); if (S.eu) ls.del(minKey('ev')); $('ev-minuta').classList.add('hidden'); $('ev-minuta-st').innerHTML = ''; }
+/** Ao abrir o formulário, oferece recuperar a minuta do mesmo compromisso (ou de um novo). */
+function evMinutaOferecer(id) {
+  $('ev-minuta-st').innerHTML = '';
+  const m = minLer('ev'), b = $('ev-minuta');
+  if (!m || (m.id || '') !== (id || '') || !$('ev-leitura').classList.contains('hidden')) { b.classList.add('hidden'); return; }
+  const tit = m.campos['ev-titulo'] || '(sem título)';
+  b.innerHTML = `<i class="fa-solid fa-file-pen"></i><span style="flex:1">Há uma minuta não salva${id ? ' deste compromisso' : ''}: <b>${esc(tit)}</b> (${minData(m.em)}).</span>
+    <button type="button" class="btn btn-s" style="height:30px;font-size:12px" onclick="evMinutaRecuperar()">Recuperar</button><button type="button" class="btn btn-s" style="height:30px;font-size:12px" onclick="evMinutaLimpar()">Descartar</button>`;
+  b.classList.remove('hidden');
+}
+function evMinutaRecuperar() {
+  const m = minLer('ev'); if (!m) return;
+  porCampos(m.campos);
+  const r = document.querySelector(`input[name="ev-ag"][value="${CSS.escape(m.ag || '')}"]:not(:disabled)`); if (r) r.checked = true;
+  alternarDiaInteiro(true); checarConflito();
+  $('ev-minuta').classList.add('hidden');
+  $('ev-minuta-st').innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i>Minuta recuperada`;
+  toast('Minuta recuperada.');
+}
+document.addEventListener('DOMContentLoaded', () => {
+  $('ex-form').addEventListener('input', e => { if (e.target.id !== 'ex-ag' && e.target.id !== 'ex-data' && e.target.id !== 'ex-bkp-arq') exMinutaAgendar(); });
+  $('ex-form').addEventListener('change', e => { if (e.target.id !== 'ex-bkp-arq') exMinutaAgendar(); });
+  const corpo = document.querySelector('#m-evento .m-corpo');
+  corpo.addEventListener('input', evMinutaAgendar); corpo.addEventListener('change', evMinutaAgendar);
+});
+
 // =================== CONEXÃO ===================
 function abrirConexao() {
   $('cx-url').value = apiUrl; $('cx-status').classList.add('hidden');
@@ -2281,7 +2537,7 @@ function configurarPWA() {
   try {
     const base = location.href.split('#')[0].split('?')[0], escopo = base.replace(/[^/]*$/, '');
     const ic = iconeApp(512), ic192 = iconeApp(192);
-    const man = { name: 'GABAgenda · Agenda do Gabinete', short_name: 'GABAgenda', start_url: base, scope: escopo, display: 'standalone', background_color: '#0f172a', theme_color: '#0f172a', lang: 'pt-BR',
+    const nm = nomeSistema() || 'GABAgenda', man = { name: nm + ' · ' + C.identidade.subtitulo, short_name: nm, start_url: base, scope: escopo, display: 'standalone', background_color: '#0f172a', theme_color: '#0f172a', lang: 'pt-BR',
       icons: [{ src: ic192, sizes: '192x192', type: 'image/png' }, { src: ic, sizes: '512x512', type: 'image/png', purpose: 'any maskable' }] };
     const l = document.createElement('link'); l.rel = 'manifest'; l.href = 'data:application/manifest+json,' + encodeURIComponent(JSON.stringify(man)); document.head.appendChild(l);
     const ap = document.createElement('link'); ap.rel = 'apple-touch-icon'; ap.href = ic192; document.head.appendChild(ap);
@@ -2317,6 +2573,8 @@ setInterval(() => { if (S.eu && !document.hidden) { atualizarBadgeHoje(); if (ab
 
 window.addEventListener('load', () => {
   $('ano-atual').textContent = new Date().getFullYear();
+  try { const idc = JSON.parse(ls.get('gcal_ident') || 'null'); if (idc) C.identidade = Object.assign({}, CONFIG_PADRAO.identidade, idc); } catch (e) { /* padrão */ }
+  aplicarIdentidade(C.identidade);
   sincTema(); configurarPWA();
   if (sessao && apiUrl) iniciarApp();
   else carregarUsuariosPublicos();
