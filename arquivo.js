@@ -6,7 +6,7 @@
  *
  * Coloque este arquivo na MESMA pasta do index.html (ex.: raiz do repositório no GitHub Pages).
  */
-const VERSAO_CACHE = 'gabagenda-v1.2.0';
+const VERSAO_CACHE = 'gabagenda-v1.3.0';
 const ESSENCIAIS = ['./', './index.html'];
 const CDN = /(^|\.)(cdnjs\.cloudflare\.com|fonts\.googleapis\.com|fonts\.gstatic\.com|cdn\.jsdelivr\.net)$/;
 
