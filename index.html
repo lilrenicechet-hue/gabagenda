@@ -888,7 +888,7 @@ html.escuro #painel-online header{background:linear-gradient(90deg,#0f291d,var(-
         <div><label class="lb" for="u-perfil">Perfil (camada de acesso)</label><select class="inp" id="u-perfil" onchange="dicaPerfil()"></select></div>
         <div style="display:flex;align-items:flex-end;padding-bottom:8px"><label style="display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:13px;cursor:pointer"><input type="checkbox" id="u-ativo"> Acesso ativo</label></div>
         <p class="full" id="u-dica" style="margin:0;font-size:12px;color:var(--mut);background:var(--soft);border-radius:10px;padding:9px 12px;line-height:1.45"></p>
-        <div class="full"><span class="lb">Agendas sob responsabilidade</span><div class="ag-op" id="u-agendas"></div><p style="margin:6px 0 0;font-size:11.5px;color:var(--mut)">Perfis sem "ver todas" enxergam somente estas agendas; "criar" e "editar" valem para elas.</p></div>
+        <div class="full"><span class="lb">Agendas sob responsabilidade</span><div class="ag-op" id="u-agendas"></div><p style="margin:6px 0 0;font-size:11.5px;color:var(--mut)">A pessoa vê somente estas agendas. Exceção: Administrador e quem estiver numa agenda com <b>acesso total</b> (a GS) veem e trabalham em todas.</p></div>
         <div class="full" style="padding:12px;border-radius:12px;background:#fffbeb;border:1px solid #fde68a" id="u-senha-box">
           <label class="lb" for="u-senha" id="u-senha-lb" style="color:#92400e">Senha</label>
           <div style="display:flex;gap:8px"><div class="campo-ico" style="flex:1;margin:0"><i class="fa-solid fa-key"></i><input type="password" id="u-senha" autocomplete="new-password" style="padding-top:10px;padding-bottom:10px"><button type="button" class="olho" onclick="verSenha('u-senha', this)"><i class="fa-regular fa-eye"></i></button></div>
@@ -963,7 +963,7 @@ html.escuro #painel-online header{background:linear-gradient(90deg,#0f291d,var(-
 // =================== CONFIGURAÇÃO ===================
 // Cole aqui a URL /exec do Apps Script para que todos usem o mesmo endereço sem configurar.
 const URL_APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbyw7l7L6je29IROxu1YSBccyW5j58LJw5CKwW5DSG205kLy62bii6zBtIoC_Z2Kqv50Jw/exec';
-const VERSAO = '1.3.0';
+const VERSAO = '1.4.0';
 // Padrões das configurações (iguais aos do code.gs; os valores reais vêm da planilha ao entrar)
 const CONFIG_PADRAO = {
   identidade: { nomeA: 'GAB', nomeB: 'Agenda', subtitulo: 'Agenda integrada do gabinete', governo: 'Governo de Mato Grosso',
@@ -1008,6 +1008,7 @@ const PERMS = [
   ['historico', 'Ver o histórico e registros', 'Auditoria das agendas que vê'],
   ['admin', 'Administração do sistema', 'Exclusivo do perfil Administrador']
 ];
+const PERMS_VIS = () => PERMS.filter(p => !['verTodas', 'editarTodas'].includes(p[0]));
 let H0 = 6, H1 = 23; const PX = 46;
 
 const ls = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }, del(k) { try { localStorage.removeItem(k); } catch (e) {} } };
@@ -1218,7 +1219,7 @@ function aplicarDados(d) {
   S.eventos = (d.eventos || []).sort(ordenarEv);
   S.perfis = d.perfis || {};
   S.eu = d.eu; S.pessoas = d.pessoas || []; S.dataVersion = d.dataVersion;
-  $('eu-nome').textContent = S.eu.usuario; $('eu-perfil').textContent = S.eu.perfil;
+  $('eu-nome').textContent = S.eu.usuario; $('eu-perfil').textContent = S.eu.perfil + (S.eu.acessoTotal && !ehAdmin() ? ' · todas' : '');
   const av = $('eu-av'); av.textContent = iniciais(S.eu.usuario); av.setAttribute('style', corAv(S.eu.usuario));
   S.docs = d.docs || {};
   aplicarConfig(d.config);
@@ -1864,6 +1865,7 @@ async function carregarUsuariosAdm() {
   catch (e) { toast(e.message, 'erro'); }
 }
 const corPerfil = n => (S.perfis[n] || {}).cor || '#64748b';
+const usuarioTotal = u => u.perfil === 'Administrador' || (u.agendas || []).some(id => (agDe(id) || {}).acessoTotal);
 function renderAdmUsuarios() {
   const on = new Set((S.online || []).map(o => o.usuario));
   const l = S.usuarios.slice().sort((a, b) => (b.ativo - a.ativo) || a.usuario.localeCompare(b.usuario));
@@ -1874,7 +1876,7 @@ function renderAdmUsuarios() {
       return `<div class="usr-card ${u.ativo ? '' : 'off'}">
         <div class="usr-topo"><div class="usr-av" style="${corAv(u.usuario)}">${esc(iniciais(u.usuario))}${ol ? `<span class="st ${ol.status === 'ausente' ? 'aus' : ''}"></span>` : ''}</div>
           <div style="min-width:0;flex:1"><div class="usr-nome">${esc(u.usuario)}</div><div class="usr-sub">${ol ? `<span style="color:var(--verde);font-weight:700">● ${esc(ol.tela || 'Online')}</span>` : u.ultimoAcesso ? 'Último acesso: ' + esc(u.ultimoAcesso) : 'Nunca acessou'}</div></div>
-          <span class="tag" style="--c:${corPerfil(u.perfil)}">${esc(u.perfil)}</span></div>
+          <span style="display:flex;flex-direction:column;align-items:flex-end;gap:3px"><span class="tag" style="--c:${corPerfil(u.perfil)}">${esc(u.perfil)}</span>${usuarioTotal(u) ? '<span class="tag" style="--c:#0f766e" title="Vê e trabalha em todas as agendas"><i class="fa-solid fa-eye"></i>Todas as agendas</span>' : '<span class="tag" style="--c:#64748b" title="Vê somente as próprias agendas"><i class="fa-solid fa-lock"></i>Só as suas</span>'}</span></div>
         <div style="display:flex;flex-wrap:wrap;gap:4px">${u.agendas.length ? u.agendas.map(id => { const a = agDe(id); return a ? `<span class="tag" style="--c:${a.cor}">${esc(a.sigla)}</span>` : ''; }).join('') : '<span style="font-size:11.5px;color:var(--mut2)">Sem agendas atribuídas</span>'}</div>
         <div style="font-size:11.5px;color:${u.temSenha ? 'var(--mut)' : 'var(--amb)'}"><i class="fa-solid ${u.temSenha ? 'fa-lock' : 'fa-lock-open'}"></i> ${esc(u.situacao || (u.temSenha ? 'Senha definida' : 'Sem senha'))}${u.exigirTroca ? ' · troca pendente' : ''}${u.ativo ? '' : ' · <b>desativado</b>'}</div>
         <div class="usr-acoes"><button class="btn btn-s" onclick="abrirUsuario(${jsA(u.usuario)})"><i class="fa-solid fa-pen"></i>Editar</button>${ol && u.usuario !== S.eu.usuario ? `<button class="btn btn-perigo" onclick="encerrarSessoes(${jsA(u.usuario)})"><i class="fa-solid fa-power-off"></i>Desconectar</button>` : ''}</div></div>`;
@@ -1911,7 +1913,7 @@ function abrirUsuario(nome) {
 function dicaPerfil() {
   const p = S.perfis[$('u-perfil').value];
   if (!p) { $('u-dica').textContent = 'Perfil inexistente: escolha outro.'; return; }
-  const tem = PERMS.filter(x => p.perm[x[0]]).map(x => x[1]);
+  const tem = PERMS_VIS().filter(x => p.perm[x[0]]).map(x => x[1]);
   $('u-dica').innerHTML = `<b style="color:${p.cor}">${esc($('u-perfil').value)}</b> — ${esc(p.descricao || '')}<br>${tem.length ? 'Pode: ' + tem.map(esc).join(' · ') : 'Somente consulta das agendas atribuídas.'}`;
 }
 function gerarSenha() {
@@ -1948,7 +1950,7 @@ async function excluirUsuario() {
 // Agendas
 function renderAdmAgendas() {
   const usadas = new Set(S.eventos.map(e => e.agendaId));
-  $('adm-conteudo').innerHTML = `<div class="card pad"><div class="adm-cab"><div><h3>Agendas e cores</h3><p>Cada agenda é uma camada do calendário (titular, sigla e cor). Desative uma agenda para escondê-la sem perder os compromissos. A ordem define a exibição.</p></div>
+  $('adm-conteudo').innerHTML = `<div class="card pad"><div class="adm-cab"><div><h3>Agendas e cores</h3><p>Cada agenda é uma camada do calendário (titular, sigla e cor). <b>Acesso total</b>: quem pertence à agenda vê e trabalha em todas as outras (ligado na GS); nas demais, cada pessoa vê só a própria agenda. Desative uma agenda para escondê-la sem perder os compromissos. A ordem define a exibição.</p></div>
     <button class="btn btn-s" onclick="agNova()"><i class="fa-solid fa-plus"></i>Nova agenda</button></div>
     ${agEdit.map((a, i) => `<div class="ag-lin ${a.ativo ? '' : 'off'}">
       <div class="ordem"><button onclick="agMover(${i},-1)" ${i ? '' : 'disabled'}><i class="fa-solid fa-chevron-up"></i></button><button onclick="agMover(${i},1)" ${i < agEdit.length - 1 ? '' : 'disabled'}><i class="fa-solid fa-chevron-down"></i></button></div>
@@ -1956,12 +1958,13 @@ function renderAdmAgendas() {
       <label class="campo" style="width:110px"><span>Sigla</span><input class="inp" value="${esc(a.sigla)}" maxlength="20" oninput="agEdit[${i}].sigla=this.value.toUpperCase()" style="text-transform:uppercase;font-weight:700"></label>
       <label class="campo" style="flex:1;min-width:160px"><span>Titular</span><input class="inp" value="${esc(a.titular)}" maxlength="80" oninput="agEdit[${i}].titular=this.value"></label>
       <label class="campo" style="width:190px"><span>Cargo (cabeçalho do PDF)</span><input class="inp" value="${esc(a.cargo || '')}" maxlength="60" placeholder="Ex.: Secretária Adjunta" oninput="agEdit[${i}].cargo=this.value"></label>
+      <div class="campo" title="Quem pertence a esta agenda vê e trabalha em todas as outras"><span>Acesso total</span><button class="sw ${a.acessoTotal ? 'on' : ''}" onclick="agEdit[${i}].acessoTotal=!agEdit[${i}].acessoTotal;renderAdmAgendas()"><span></span></button></div>
       <div class="campo"><span>Ativa</span><button class="sw ${a.ativo ? 'on' : ''}" onclick="agEdit[${i}].ativo=!agEdit[${i}].ativo;renderAdmAgendas()"><span></span></button></div>
       <button class="btn-ic" title="${usadas.has(a.id) ? 'Tem compromissos: desative em vez de remover' : 'Remover'}" ${usadas.has(a.id) ? 'disabled style="opacity:.35"' : ''} onclick="agEdit.splice(${i},1);renderAdmAgendas()"><i class="fa-solid fa-trash-can"></i></button>
       <span class="cod" style="align-self:center">${esc(a.id || 'nova')}</span></div>`).join('')}
     <div class="barra-salvar"><button class="btn btn-s" onclick="admIr('agendas')">Descartar</button><button class="btn btn-p" onclick="agSalvar(this)"><i class="fa-solid fa-floppy-disk"></i>Salvar agendas</button></div></div>`;
 }
-function agNova() { agEdit.push({ id: '', sigla: '', titular: '', cargo: '', cor: '#' + Math.floor(Math.random() * 0xbbbbbb + 0x222222).toString(16).padStart(6, '0'), ativo: true }); renderAdmAgendas(); }
+function agNova() { agEdit.push({ id: '', sigla: '', titular: '', cargo: '', acessoTotal: false, cor: '#' + Math.floor(Math.random() * 0xbbbbbb + 0x222222).toString(16).padStart(6, '0'), ativo: true }); renderAdmAgendas(); }
 function agMover(i, d) { const j = i + d; [agEdit[i], agEdit[j]] = [agEdit[j], agEdit[i]]; renderAdmAgendas(); }
 async function agSalvar(b) {
   if (agEdit.some(a => !a.sigla.trim())) return toast('Toda agenda precisa de uma sigla.', 'aviso');
@@ -1973,14 +1976,14 @@ async function agSalvar(b) {
 // Camadas de acesso (perfis)
 function renderAdmCamadas() {
   const nomes = Object.keys(pfEdit), uso = n => S.usuarios.filter(u => u.perfil === n).length;
-  $('adm-conteudo').innerHTML = `<div class="card pad"><div class="adm-cab"><div><h3>Camadas de acesso</h3><p>Cada perfil define o que o usuário pode fazer. Clique nos quadrados para ligar ou desligar uma permissão. O perfil <b>Administrador</b> é fixo e tem acesso total.</p></div>
+  $('adm-conteudo').innerHTML = `<div class="card pad"><div class="adm-cab"><div><h3>Camadas de acesso</h3><p>Cada perfil define o que o usuário pode fazer. Clique nos quadrados para ligar ou desligar uma permissão. O perfil <b>Administrador</b> é fixo e tem acesso total.<br><b>Quais agendas cada pessoa vê:</b> Administrador e quem pertence a uma agenda com <b>acesso total</b> (a GS) veem e trabalham em todas; os demais veem só as próprias agendas. Isso é definido em <a href="#" onclick="admIr('agendas');return false" style="color:var(--azul);font-weight:700">Agendas e cores</a>.</p></div>
     <button class="btn btn-s" onclick="pfNovo()"><i class="fa-solid fa-plus"></i>Novo perfil</button></div>
     <div class="mx-wrap"><table class="mx"><thead><tr><th class="p">Permissão</th>${nomes.map(n => { const p = pfEdit[n], adm = n === 'Administrador';
       return `<th style="--c:${p.cor}"><div class="ic"><i class="fa-solid ${adm ? 'fa-crown' : 'fa-layer-group'}"></i></div>
         ${adm ? `<b>${esc(n)}</b>` : `<input class="inp" style="height:30px;width:120px;text-align:center;font-weight:700" value="${esc(n)}" ${uso(n) ? `disabled title="Em uso: não pode ser renomeado"` : ''} onchange="pfRenomear(${jsA(n)}, this.value)">`}
         <small>${uso(n)} usuário(s)</small>
         ${adm ? '' : `<div style="display:flex;gap:4px;justify-content:center;margin-top:4px"><input type="color" class="cor-inp" style="width:30px;height:26px" value="${esc(p.cor)}" oninput="pfEdit[${jsA(n)}].cor=this.value">${uso(n) ? '' : `<button class="btn-ic" style="width:26px;height:26px" title="Remover perfil" onclick="delete pfEdit[${jsA(n)}];renderAdmCamadas()"><i class="fa-solid fa-trash-can"></i></button>`}</div>`}</th>`; }).join('')}</tr></thead>
-    <tbody>${PERMS.map(([k, r, s]) => `<tr><td class="p"><b style="font-weight:600">${esc(r)}</b><small>${esc(s)}</small></td>${nomes.map(n => {
+    <tbody>${PERMS_VIS().map(([k, r, s]) => `<tr><td class="p"><b style="font-weight:600">${esc(r)}</b><small>${esc(s)}</small></td>${nomes.map(n => {
       const on = !!pfEdit[n].perm[k], trava = n === 'Administrador' || k === 'admin';
       return `<td><button class="mx-b ${on ? 'on' : ''}" style="--c:${pfEdit[n].cor}" ${trava ? 'disabled' : ''} onclick="pfAlternar(${jsA(n)},'${k}')"><i class="fa-solid ${on ? 'fa-check' : 'fa-minus'}"></i></button></td>`; }).join('')}</tr>`).join('')}
     <tr><td class="p"><b style="font-weight:600">Descrição</b><small>Aparece na ficha do usuário</small></td>${nomes.map(n => `<td><textarea class="inp" rows="2" style="width:130px;font-size:11.5px" ${n === 'Administrador' ? 'disabled' : ''} oninput="pfEdit[${jsA(n)}].descricao=this.value">${esc(pfEdit[n].descricao || '')}</textarea></td>`).join('')}</tr></tbody></table></div>
